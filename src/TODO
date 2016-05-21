@@ -1,0 +1,33 @@
+TODO
+  [ ] generate a doxyfile for code documentation and add to the master Makefile a 'make docs' target.
+  [ ] add more logging throughout the system.
+  [ ] add an option for a formatter that includes visible pipe separators between aligned columns
+  [ ] include a row of dashes after the header line for aligned columns
+  [ ] add some linter scripts to test the code for style and correctness.
+  [ ] audit the shell code for READONLY changes to be made.
+  [ ] add env variables to the wiki that are only in the shell code.
+  [ ] 
+
+database.cpp
+  [ ] 
+
+_ash_log.cpp
+  [ ] 
+
+ash_query.cpp
+  [ ] If ASH_CFG_HISTORY_DB is undefined, assume they don't know what the command / utility is - have a more inviting message.  If you are setting this up for the first time, please see http://sites.google.com/projects/advanced_shell_history/...
+  [ ] add a flag to log to stderr or a specific file?
+  [ ] add a --debug flag to turn on debugging output to stderr by default.
+  [ ] 
+
+
+BUGS
+  [ ] 
+
+
+WISHLIST (harder things that would be nice to have):
+  [ ] find a safe way to get the 'builtin type' details for a command (without re-executing it)
+  [ ]   add an option to ignore non-commands: ASH_CFG_IGNORE_NON_COMMANDS='true'  # this avoids keeping passwords and/or junk commands in your database.
+  [ ] make LOG(ERROR) and above also go to stderr - this is actually not easy, given the way the logger works now.
+  [ ] design a shell history function that attempts to intercept builtin history calls and redirect to builtin history wherever necessary ???
+  [ ] 

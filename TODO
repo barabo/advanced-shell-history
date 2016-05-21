@@ -1,0 +1,10 @@
+TODO
+  [ ] rewrite the schema to allow easy per-host aggregation (session must include a machine ID)
+  [ ] add a script to cut a new release
+  [ ] write more interesting queries
+  [ ] enable tab completion for query names
+  [ ] finish the ip address feature in unix.py to use ASH_CFG_ variables
+  [ ] test with cssh localhost x10 for db locking and timeout settings - tune
+  [ ] recruit OSX helpers
+  [ ] design a python or c++ daemon to manage the DB writing portion.
+  [ ] 

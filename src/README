@@ -1,0 +1,188 @@
+   Copyright 2011 Carl Anderson
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+READ THIS FIRST - if you are interested in contributing code to this project!
+---------------
+      \0/
+       Y
+      / \
+
+
+First, thank you for reading this and thank you for your interest.  For the
+benefit of all, I've written up a general set of code style guidelines to help
+make the released code easy for newcomers to read and get up to speed with.
+
+
+
+Code Conventions
+
+This file describes the code conventions used throughout this code and sets
+the standard for all future contributions.
+
+This document is intended to set the ground-rules for code style with the hope
+that overall readability is high and conventions are universal.  The last thing
+we want is to have a mishmash of various styles - this doesn't help anyone.
+
+
+General
+  * Max line length - 80 characters.
+  * No trailing whitespace.
+  * Use const and pass-by-reference wherever possible.
+  * Files must have the complete copyright starting on the first possible line.
+  * Do not use C++ exceptions.
+
+
+Comments
+  * TODO comments are formatted as follows:
+    TODO(your_username): This is the comment.
+  * Single line comments use // Comment.
+  * Line comments trailing code - use two spaces between code and comment.
+  * Multi-line comments within code use multiple // comments.
+  * Blocks of comments before classes use Javadoc-style comments.
+    /**
+     * Example Block comment.
+     *
+     * This comment would normally preceed a class or function.
+     */
+  * Do not include commented-out code in your submissions.
+
+
+Function Names
+  * use_underscores for functions (not camelCase or StudlyCaps).
+  * default arguments are OK for simple types.
+
+
+Namespaces
+  * Declared in headers like this:
+    namespace ash {
+    ...
+    }  // namespace ash
+  * Headers don't declare 'using namespace XYZ'
+      - this is reserved for the cpp file.
+
+
+Macro guards
+  * Each hpp file has one.
+    // Example: my_file.hpp
+    #ifndef __MY_FILE__
+    #define __MY_FILE__
+    ...
+    #endif  /* __MY_FILE__ */
+  * Put no code outside of the macro guards.
+
+
+Class Declatations
+  Naming
+    * Classes are named using the StudlyCaps convention where each word is
+      capitalized (including the first).
+
+  Fowrard Declarations
+    * Use forward declarations in headers wherever possible.
+    * Label forward declarations with a trailing comment.
+      Example:
+        class MyForwardDeclaredClass;  // Forward declaration.
+
+  Use of Static
+    * Declare static methods and members before non-static ones.
+    * If you use static and non-static in a class, declare
+      separate // STATIC: and // NON-STATIC: sections.
+
+  Visibility
+    * Declare public before protected before private.
+    * Don't rely on default or implicit protection levels.
+        - Explicitly declare private for classes and public for structs.
+
+  Constructors and Destructors (ctors & dtors)
+    * Declare before all other methods: ctor(s), copy ctor, dtor.
+    * If a class contains any virtual methods, the dtor must be virtual too.
+    * If a class disallows copy ctor, also disallow the assignment operator.
+    * If assignment operator and copy ctor are disabled, disable them at the
+      very end of the class.
+    * Use member initializers wherever possible.
+
+  Methods
+    * Declare const methods before non-const methods.
+    * Declare in alphabetical order.
+
+  Members
+    * Declare in any order (preferrably one that makes sense).
+    * Do not include the type in the member name.
+      Example:
+        string name;  // OK
+        string name_str;  // DON'T
+    * Do not include a leading or trailing underscore in the name.
+
+  Inheritance
+    * Use public inheritance only.
+    * No multiple inheritance.
+
+
+
+Example Class:
+
+  class MyClass {
+    // STATIC:
+    public:
+      static void example_public_static_method();
+
+    protected:
+      static void example_protected_static_method();
+
+    private:
+      static void example_private_static_method();
+
+
+    public:
+      static int example_public_static_member;
+
+    protected:
+      static int example_protected_static_member;
+
+    private:
+      static int example_private_static_member;
+
+
+    // NON-STATIC:
+    public:
+      MyClass();
+      ~MyClass();
+
+      void example_public_const_method_1() const;
+      void example_public_const_method_2() const;
+
+      void example_public_non_const_method_1();
+      void example_public_non_const_method_2();
+
+    protected:
+      void example_protected_method();
+
+    private:
+      void example_private_method();
+
+
+    public:
+      int example_public_member;
+
+    protected:
+      int example_protected_member;
+
+    private:
+      int example_private_member;
+
+    private:
+      MyClass(const MyClass & other);  // disabled
+      MyClass & operator = (const MyClass & other);  //disabled
+
+  };  // MyClass

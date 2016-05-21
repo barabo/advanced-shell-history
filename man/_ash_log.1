@@ -1,0 +1,252 @@
+.\"
+.\"Copyright 2011 Carl Anderson
+.\"
+.\"Licensed under the Apache License, Version 2.0 (the "License");
+.\"you may not use this file except in compliance with the License.
+.\"You may obtain a copy of the License at
+.\"
+.\"    http://www.apache.org/licenses/LICENSE-2.0
+.\"
+.\"Unless required by applicable law or agreed to in writing, software
+.\"distributed under the License is distributed on an "AS IS" BASIS,
+.\"WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.\"See the License for the specific language governing permissions and
+.\"limitations under the License.
+.\"
+
+.TH _ash_log 1 \
+  "Updated: __DATE__" \
+  "__VERSION__" \
+  "Advanced Shell History"
+
+
+.SH NAME
+_ash_log - The advanced shell history command logger.
+
+
+.SH SYNOPSIS
+Usage: _ash_log [options]
+  -h  --help
+  -a  --alert VALUE
+  -c  --command VALUE
+  -e  --command_exit VALUE
+  -p  --command_pipe_status VALUE
+  -s  --command_start VALUE
+  -f  --command_finish VALUE
+  -n  --command_number VALUE
+  -x  --exit VALUE
+  -V  --version
+  -S  --get_session_id
+  -E  --end_session
+
+
+.SH DESCRIPTION
+.B _ash_log and _ash_log.py are not intended to be executed manually.
+They are invoked automatically by the advanced shell history system which is 
+only activated by sourcing the appropriate file (depending on whether you are
+using bash or zsh).
+
+Advanced Shell History includes:
+.RS
+Session details:
+.RS
+.IP "* login and logout times"
+.IP "* username and hostname"
+.IP "* incoming ssh connection details (ip and ports)"
+.IP "* shell name"
+.IP "* tty, shell pid and ppid"
+.RE
+
+Command details:
+.RS
+.IP "* start and stop times"
+.IP "* exit code and pipestatus codes"
+.IP "* current working directory"
+.IP "* session id"
+.RE
+
+Many more data points are also collected.
+.RE
+
+
+If you intend to use this system to manage your own personal command history,
+it is recommended that you add the appropriate source command to your shell rc
+file so it is automatically started with each new session.
+
+.B For bash, add this to your ~/.bashrc file:
+.RS
+source /usr/lib/advanced_shell_history/bash
+.RE
+
+.B For zsh, add this to your ~/.zshrc file:
+.RS
+source /usr/lib/advanced_shell_history/zsh
+.RE
+
+
+.SH OPTIONS
+.IP "  -h  --help"
+
+Display command help and exit 0.
+
+.IP "  -a  --alert VALUE"
+
+Display an alert message (VALUE).
+
+.IP "  -c  --command VALUE"
+
+Store the command (VALUE) entered by the user.
+
+.IP "  -e  --command_exit VALUE"
+
+Store the command exit code (VALUE) of the command.
+
+.IP "  -p  --command_pipe_status VALUE"
+
+Store the command pipe states (exit code for each piped command) separated by
+underscores.
+
+.IP "  -s  --command_start VALUE"
+
+The unix epoch timestamp (VALUE) when the command started (the user pressed
+Enter).
+
+.IP "  -f  --command_finish VALUE"
+
+The unix epoch timestamp (VALUE) when the command completed and the next prompt
+was displayed.
+
+.IP "  -n  --command_number VALUE"
+
+The shell builtin history number (VALUE) of the entered command.
+
+.IP "  -x  --exit VALUE"
+
+The exit code to use when exiting this program.
+This flag is needed to re-create the same exit status as the logged command.
+This is important because this command runs automatically before the prompt is
+redrawn, so if _ash_log does not restore the previous exit code, the user would
+see the exit code for _ash_log (and NOT their command) when executing:
+.RS
+  echo ${?}
+.RE
+
+.IP "  -V  --version"
+
+Display the version number and exit.
+
+.IP "  -S  --get_session_id"
+
+Display the advanced shell history session number and exit.  If no session ID
+is found, one is created and displayed.
+
+.IP "  -E  --end_session"
+
+Ends the current session, as defined by the shell environment variable
+ASH_SESSION_ID.  It is an error to use this flag without having the
+ASH_SESSION_ID variable set.
+
+
+.SH FILES
+.I /etc/ash/ash.conf
+.RS
+Contains environment variables to be sourced into your shell.
+.RE
+
+.I /etc/ash/queries
+.RS
+Contains saved queries which can be invoked using the
+.BR ash_query(1)
+command.  Also see
+.I ~/.ash/queries
+for user-written queries.
+.RE
+
+.I ~/.ash/history.db
+.RS
+The default location for the sqlite3 database holding command history.  See
+http://code.google.com/p/advanced-shell-history/w for more details on how
+the data is stored internally and other tips for querying the data.
+.RE
+
+.I /usr/lib/advanced_shell_history/bash
+.RS
+Sourced for bash sessions.
+.RE
+
+.I /usr/lib/advanced_shell_history/zsh
+.RS
+Sourced for zsh sessions.
+.RE
+
+
+.SH ENVIRONMENT
+.IP ASH_CFG_DB_FAIL_RANDOM_TIMEOUT
+After a failed insert, sleep a random number of milliseconds before retrying.
+This is intended to add some noise to the retry mechanism.
+
+.IP ASH_CFG_DB_FAIL_TIMEOUT
+After a failed insert, sleep this many milliseconds before retrying.
+
+.IP ASH_CFG_DB_MAX_RETRIES
+Quit db retries after this many failed attempts.
+
+.IP ASH_CFG_HIDE_USAGE_FOR_NO_ARGS
+Normally, if you invoke ash_query with no arguments, the --help output is
+displayed.  With this set to a non-empty value, the --help output is
+suppressed in this case.
+
+.IP ASH_CFG_HISTORY_DB
+The default database to query.  This is set by sourcing one of the shell
+scripts in /usr/lib/advanced_shell_history and signifies the location
+of the database where commands are logged.  If this variable exists, the
+--database flag does not need to be used.
+
+.IP ASH_CFG_IGNORE_UNKNOWN_FLAGS
+Normally ash_query complains when it sees unknown flags.  With this variable
+set to a non-empty value, unknown flags are ignored.
+
+.IP ASH_CFG_LOG_DATE_FMT
+If logging is in use, this format string can be set to customize the date
+string.
+
+.IP ASH_CFG_LOG_FILE
+The file destination of logged messages, if logging is in use.
+
+.IP ASH_CFG_LOG_IPV4
+Can be used to skip logging ipv4 host IP addresses.
+
+.IP ASH_CFG_LOG_IPV6
+Can be used to skip logging ipv6 host IP addresses.
+
+.IP ASH_CFG_LOG_LEVEL
+The lowest level of logging to make visible.  Levels (in increasing order)
+are DEBUG, INFO, WARN, ERROR and FATAL.
+
+.IP ASH_CFG_SKIP_LOOPBACK
+Skip logging IP addresses for loopback devices (both ipv4 and ipv6).
+
+.IP ASH_DISABLED
+If set, _ash_log is disabled.
+
+.IP ASH_LOG_BIN
+The binary used to log command history to the database.  This should be either
+_ash_log or _ash_log.py, depending on your system setup.
+
+.IP ASH_SESSION_ID
+The session id number created for the current session.  If unset, a new
+session ID will be created and displayed.  The caller is expected to export
+this variable using the generated ID number.
+
+
+.SH "SEE ALSO"
+.BR ash_query(1)
+to query history
+
+
+.SH AUTHOR
+Carl Anderson, Google Inc.
+
+
+.SH BUGS
+Report bugs at http://code.google.com/p/advanced-shell-history/issues

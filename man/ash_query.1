@@ -1,0 +1,223 @@
+.\"
+.\"Copyright 2011 Carl Anderson
+.\"
+.\"Licensed under the Apache License, Version 2.0 (the "License");
+.\"you may not use this file except in compliance with the License.
+.\"You may obtain a copy of the License at
+.\"
+.\"    http://www.apache.org/licenses/LICENSE-2.0
+.\"
+.\"Unless required by applicable law or agreed to in writing, software
+.\"distributed under the License is distributed on an "AS IS" BASIS,
+.\"WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.\"See the License for the specific language governing permissions and
+.\"limitations under the License.
+.\"
+
+.TH ash_query 1 \
+  "Updated: __DATE__" \
+  "__VERSION__" \
+  "Advanced Shell History"
+
+
+.SH NAME
+ash_query - The advanced shell history query manager.
+
+
+.SH SYNOPSIS
+Usage: ash_query [options]
+      --help
+  -d  --database VALUE
+  -f  --format VALUE
+  -l  --limit VALUE
+  -p  --print_query VALUE
+  -q  --query VALUE
+  -F  --list_formats
+  -H  --hide_headings
+  -Q  --list_queries
+      --version
+
+
+.SH DESCRIPTION
+.B ash_query
+is a part of the Advanced Shell History package.  It provides a
+convenient way to execute saved queries against a command history database.
+
+To collect command history data and to populate a history database, you must
+first source the appropriate shell code into your shell session.
+
+If you intend to use this system to manage your own personal command history,
+it is recommended that you add the appropriate source command to your shell rc
+file so it is automatically started with each new session.
+
+.B For bash, add this to your ~/.bashrc file:
+.RS
+source /usr/lib/advanced_shell_history/bash
+.RE
+
+.B For zsh, add this to your ~/.zshrc file:
+.RS
+source /usr/lib/advanced_shell_history/zsh
+.RE
+
+
+.SH OPTIONS
+.IP "      --help"
+
+Display help and exit 0.
+
+.IP "  -d  --database VALUE"
+
+The filename (VALUE) of the database to query.
+Typically this will be ~/.ash/history.db.
+If this is not specified on the command line, ash_query will look for a shell
+environment variable ASH_CFG_HISTORY_DB and try to use that.
+
+.IP "  -f  --format VALUE"
+
+Select an output format (VALUE) from:
+
+.B aligned
+  Columns are aligned and separated with spaces.      
+
+.B csv
+  Columns are comma separated with strings quoted.    
+
+.B group
+  Repeated values are summarized before the rows.     
+
+.B null
+  Columns are null separated with strings quoted. 
+
+If format is not specified, ash_query will look for a default format
+environment variable ASH_CFG_DEFAULT_FORMAT and try to use that.
+If neither are specified, the default is 'aligned'.
+
+
+.IP "  -l  --limit VALUE"
+
+Return no more than VALUE rows.  If the query already contains a limit
+clause, that clause overrides this value.  This value is ignored if less
+than or equal to zero.
+
+.IP "  -p  --print_query VALUE"
+
+Print the named query (VALUE) to stdout.
+If the query uses shell variables, the generic query will be printed in
+addition to the query after variable substitution.
+
+.IP "  -q  --query VALUE"
+
+Execute the named query (VALUE) and display results formatted according to
+the specified --format.  If no query is specified, ash_query will check for
+a named query in the shell environment variable ASH_CFG_DEFAULT_QUERY and
+attempt to use that.
+
+.IP "  -F  --list_formats"
+
+List all the available output formats.
+
+.IP "  -H  --hide_headings"
+
+Suppress the headings of output tables (sometimes useful for scripting).
+
+.IP "  -Q  --list_queries"
+
+List the names and descriptions of all available saved queries taken from
+/etc/ash/queries and ~/.ash/queries.
+
+.IP "      --version"
+
+Display the version number and exit.
+
+
+.SH FILES
+.I /etc/ash/ash.conf
+.RS
+Contains environment variables to be sourced into your shell.
+.RE
+
+.I /etc/ash/queries
+.RS
+Contains saved queries which can be invoked using the
+.BR ash_query(1)
+command.  Also see
+.I ~/.ash/queries
+for user-written queries.
+.RE
+
+.I ~/.ash/history.db
+.RS
+The default location for the sqlite3 database holding command history.  See
+http://code.google.com/p/advanced-shell-history/w for more details on how
+the data is stored internally and other tips for querying the data.
+.RE
+
+.I /usr/lib/advanced_shell_history/bash
+.RS
+Sourced for bash sessions.
+.RE
+
+.I /usr/lib/advanced_shell_history/zsh
+.RS
+Sourced for zsh sessions.
+.RE
+
+
+.SH ENVIRONMENT
+.IP ASH_CFG_DB_FAIL_RANDOM_TIMEOUT
+After a failed select, sleep a random number of milliseconds before retrying.
+This is intended to add some noise to the retry mechanism.
+
+.IP ASH_CFG_DB_FAIL_TIMEOUT
+After a failed select, sleep this many milliseconds before retrying.
+
+.IP ASH_CFG_DB_MAX_RETRIES
+Quit db retries after this many failed attempts.
+
+.IP ASH_CFG_DEFAULT_FORMAT
+The default format to display queried data returned by ash_query.  Set this
+to something other than 'aligned' if you prefer a different format.
+
+.IP ASH_CFG_DEFAULT_QUERY
+The default query to execute by ash_query.  Set this to the name of your
+favorite query if you don't want to specify the same query name each time.
+
+.IP ASH_CFG_HIDE_USAGE_FOR_NO_ARGS
+Normally, if you invoke ash_query with no arguments, the --help output is
+displayed.  With this set to a non-empty value, the --help output is
+suppressed in this case.
+
+.IP ASH_CFG_HISTORY_DB
+The default database to query.  This is set by sourcing one of the shell
+scripts in /usr/lib/advanced_shell_history and signifies the location
+of the database where commands are logged.  If this variable exists, the
+--database flag does not need to be used.
+
+.IP ASH_CFG_IGNORE_UNKNOWN_FLAGS
+Normally ash_query complains when it sees unknown flags.  With this variable
+set to a non-empty value, unknown flags are ignored.
+
+.IP ASH_CFG_LOG_DATE_FMT
+If logging is in use, this format string can be set to customize the date
+string.
+
+.IP ASH_CFG_LOG_FILE
+The file destination of logged messages, if logging is in use.
+
+.IP ASH_CFG_LOG_LEVEL
+The lowest level of logging to make visible.  Levels (in increasing order)
+are DEBUG, INFO, WARN, ERROR and FATAL.
+
+
+.SH "SEE ALSO"
+.BR _ash_log(1)
+for logging history
+
+
+.SH AUTHOR
+Carl Anderson, Google Inc.
+
+
+.SH BUGS
+Report bugs at http://code.google.com/p/advanced-shell-history/issues

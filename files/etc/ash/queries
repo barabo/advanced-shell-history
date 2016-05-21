@@ -1,0 +1,93 @@
+#
+#   Copyright 2012 Carl Anderson
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+
+DEMO: {
+  description: "Shows who did what, where and when (not WHY)."
+  sql: {
+    select
+      s.logname as who,
+      c.session_id,
+      c.cwd as 'where',
+      datetime(c.start_time, 'unixepoch', 'localtime') as 'when',
+      c.command as what
+    from
+      commands as c
+      inner join sessions as s
+        on c.session_id = s.id
+    order by 1, 2, 4
+    ;
+  }
+}
+
+
+CWD: {
+  description: "Shows the history for the current working directory only."
+  sql: {
+    select
+      c.session_id as "session",
+      datetime(c.start_time, 'unixepoch', 'localtime') as "when",
+      c.command as "what"
+    from
+      commands as c
+    where
+      c.cwd = '${PWD}' or c.cwd = '/${PWD}' or c.cwd = '/${PWD#//}'
+    order by 2, 1
+    ;
+  }
+}
+
+
+RCWD: {
+  description: "Shows the history rooted at the current working directory."
+  sql: {
+    select
+      c.session_id as "session",
+      c.cwd as "where",
+      datetime(c.start_time, 'unixepoch', 'localtime') as "when",
+      c.command as "what"
+    from
+      commands as c
+    where
+      c.cwd = '${PWD}' or c.cwd = '/${PWD}'
+      or c.cwd like '${PWD}/%' or c.cwd like '/${PWD}/%'
+    order by c.id
+    ;
+  }
+}
+
+
+ME: {
+  description: "Select the history for just the current session."
+  sql: {
+    select
+      c.cwd as 'current_working_dir',
+      c.command_no as 'cmd',
+      datetime(c.start_time, 'unixepoch', 'localtime') as start_time,
+      c.duration as 'secs',
+      c.rval as exit,
+      c.command
+    from
+      commands as c
+      left outer join sessions as s
+        on c.session_id = s.id
+    where
+      c.session_id = ${ASH_SESSION_ID:-0}
+    order by
+      c.id
+    ;
+  }
+}

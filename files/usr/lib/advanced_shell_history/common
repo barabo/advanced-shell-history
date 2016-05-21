@@ -1,0 +1,130 @@
+#!/bin/bash
+#
+#   Copyright 2011 Carl Anderson
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+#
+# This file is intended to be common shell code for both zsh and bash.
+#
+
+# Make sure there is a command logger.
+if [[ -z "${ASH_LOG_BIN}" ]]; then
+  ASH_LOG_BIN=/usr/local/bin/_ash_log
+fi
+if ! [[ -x "${ASH_LOG_BIN}" ]]; then
+  return
+fi
+
+
+# Create the directory holding the history database.
+if [[ ! -e "${ASH_CFG_HISTORY_DB}" ]]; then
+  mkdir -p "$( dirname "${ASH_CFG_HISTORY_DB}" )" \
+    || ${ASH_LOG_BIN} -a "Failed to mkdir -p $( dirname "${ASH_CFG_HISTORY_DB}" )"
+fi
+
+
+# Ensure there is a HISTFILE.
+if [[ -z "${HISTFILE}" ]]; then
+  export HISTFILE="${ASH_CFG_HISTORY_DB%.db}"
+  ${ASH_LOG_BIN} -a "WARN: HISTFILE undefined. Exporting HISTFILE as: '${HISTFILE}'."
+fi
+if [[ ! -e "${HISTFILE}" ]] && ! touch "${HISTFILE}" &>/dev/null; then
+  ${ASH_LOG_BIN} -a "Failed to create shell history file: '${HISTFILE}'."
+fi
+if ! chmod u+rw "${HISTFILE}" &>/dev/null; then
+  ${ASH_LOG_BIN} -a "Failed to make shell history file readable and writeable."
+fi
+
+
+##
+# Displays a message to users who manually invoked an internal-only shell
+# function.  This is to prevent curious users from messing up internal state
+# accidentally.
+#
+# Internally, this function is used within protected functions like this:
+#   function ash::example() {
+#     [[ "${ASH:-0}" == "0" ]] && ash::info ash::example && return
+#     # Protected function code here...
+#   }
+#
+function ash::info() {
+  cat << EOF_INFO
+${@:-This} is an internal function of the advanced shell history utility.
+EOF_INFO
+}
+
+
+##
+# This is invoked when a user session is exited.
+#
+# Args:
+#   rval: The numeric exit code from the last user-entered command.
+#
+function ash::end_session() {
+  # Prevent users from manually invoking this function from the command line.
+  [[ "${ASH:-0}" == "0" ]] && ash::info ash::end_session && return
+
+  ash::log "${@}"
+  ${ASH_LOG_BIN} --end_session --exit ${1}
+}
+
+# This is executed when the user types 'exit'
+trap 'ASH=1 ash::end_session ${?} ${PIPESTATUS[@]} ${pipestatus[@]}' EXIT TERM
+
+# This avoids logging duplicate commands when the user presses Ctrl-C while
+# entering a command.
+trap 'ASH_SKIP=1' INT
+export ASH_SKIP=0
+
+
+##
+# This is invoked immediately before each new prompt is displayed for the user.
+#
+# Args:
+#   rval: The numeric exit code from the last user-entered command.
+#   pipes: The set of pipe exit codes (one or more codes).
+#
+function ash::log() {
+  # Prevent users from manually invoking this function from the command line.
+  [[ "${ASH:-0}" == "0" ]] && ash::info ash::log && return
+
+  # ASH_SKIP is set only when the user presses Ctrl-C while entering a command.
+  # Since this kills the command before it was executed, there's no history to
+  # log before the next prompt is drawn.
+  if [[ "${ASH_SKIP:-1}" == "1" ]]; then
+    ASH_SKIP=0
+    return
+  fi
+
+  local no start end cmd rval="${1}" && shift
+  read -r no start end cmd <<< "$( ash::last_command )"
+  local pipes="$( sed -e 's: :_:g' <<< "${@}" )"
+
+  # Log the command.
+  ${ASH_LOG_BIN} \
+    -e ${rval:-0} \
+    -s ${start:-0} \
+    -f ${end:-0} \
+    -n ${no:-0} \
+    -p "${pipes:-0}" \
+    -c "${cmd:-UNKNOWN}"
+}
+
+
+# Protect the functions.
+readonly -f ash::end_session
+readonly -f ash::log
+
+#export -f ash::end_session
+#export -f ash::log
