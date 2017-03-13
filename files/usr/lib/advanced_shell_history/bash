@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#   Copyright 2011 Carl Anderson
+#   Copyright 2017 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ fi
 export ASH_CFG="${ASH_CFG:-/etc/ash/ash.conf}"
 
 # Source the config files to set all ASH_ shell variables.
-source <( grep "^[ ]*ASH_[A-Za-z_0-9]*=['\"].*['\"].*$" "${ASH_CFG}" \
-            | tr -cd '\11\12\15\40-\176' ) || exit 1
+source "${ASH_CFG}"
 
+# Export all sourced ASH_ variables.
 export $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
 
 # Make the env config options read-only if that option is set.
@@ -45,10 +45,16 @@ if [[ "${ASH_CFG_READONLY_ENV:-0}" != "0" ]]; then
   readonly $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
 fi
 
-source "${ASH_CFG_LIB}/common" || exit 1
+# Source the common libraries, or complain about it in the terminal.
+if [[ -e "${ASH_CFG_LIB}"/common ]]; then
+  source "${ASH_CFG_LIB}/common" || exit 1
+elif [[ -e "${ASH_CFG_LIB}" ]]; then
+  echo "advanced-shell-history ERROR: Can't find common in $ASH_CFG_LIB"
+else
+  echo "advanced-shell-history ERROR: Can't find ASH_CFG_LIB='$ASH_CFG_LIB'"
+fi
 
-
-# Display error and abort if PROMPT_COMMAND is readonly.
+# Display error and abort if PROMPT_COMMAND is (already) readonly.
 if readonly -p | grep -q "^declare -[[:alpha:]]\+ PROMPT_COMMAND="; then
   if [[ "${PROMPT_COMMAND//ash::/}" == "${PROMPT_COMMAND}" ]]; then
     ${ASH_LOG_BIN} -a "Make PROMPT_COMMAND writable to save advanced shell history."
