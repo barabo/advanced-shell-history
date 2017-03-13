@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+#   Copyright 2011 Carl Anderson
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# Prevent errors from sourcing this file mor than once.
+[[ -n "${ASH_SESSION_ID}" ]] && return
+
+# Make sure we are running the shell we think we are running.
+if ! ps ho command $$ | grep -q "bash"; then
+  echo "The shell process name implies you're not running bash..."
+  return
+fi
+
+# Use the default config file if one was not specified.
+export ASH_CFG="${ASH_CFG:-/etc/ash/ash.conf}"
+
+# Source the config files to set all ASH_ shell variables.
+source <( grep "^[ ]*ASH_[A-Za-z_0-9]*=['\"].*['\"].*$" "${ASH_CFG}" \
+            | tr -cd '\11\12\15\40-\176' ) || exit 1
+
+export $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
+
+# Make the env config options read-only if that option is set.
+if [[ "${ASH_CFG_READONLY_ENV:-0}" != "0" ]]; then
+  readonly $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
+fi
+
+source "${ASH_CFG_LIB}/common" || exit 1
+
+
+# Display error and abort if PROMPT_COMMAND is readonly.
+if readonly -p | grep -q "^declare -[[:alpha:]]\+ PROMPT_COMMAND="; then
+  if [[ "${PROMPT_COMMAND//ash::/}" == "${PROMPT_COMMAND}" ]]; then
+    ${ASH_LOG_BIN} -a "Make PROMPT_COMMAND writable to save advanced shell history."
+    return
+  fi
+fi
+export PROMPT_COMMAND='ASH=1 ash::begin_session'
+
+# HISTCONTROL is emptied primarily to remove the options that de-dupe identical
+# successive commands and remove comands with leading spaces from history.
+export HISTCONTROL=""
+readonly HISTCONTROL
+
+# HISTTIMEFORMAT is changed to unix epoch time to allow easy duration
+# calculations by subtracting start from end timestamps.
+export HISTTIMEFORMAT="%s "
+readonly HISTTIMEFORMAT
+
+
+##
+# This is invoked when a new user session begins.
+#
+function ash::begin_session() {
+  # Prevent users from manually invoking this function from the command line.
+  [[ "${ASH:-0}" == "0" ]] && ash::info ash::begin_session && return
+
+  export PROMPT_COMMAND="ASH=1 ash::precmd \${?} \${PIPESTATUS[@]}"
+  export ASH_SESSION_ID="$( ${ASH_LOG_BIN} --get_session_id )"
+  if [[ -n "${ASH_CFG_MOTD:-}" ]]; then
+    ${ASH_LOG_BIN} -a "${ASH_CFG_MOTD}session ${ASH_SESSION_ID}"
+  fi
+  readonly ASH_SESSION_ID PROMPT_COMMAND
+}
+
+
+##
+# Log the previous command and execute the previous PROMPT_COMMAND (if any)
+# afterward.  The previous command exit code is reset after this function.
+#
+function ash::precmd() {
+  # Do nothing if this variable is set.
+  [[ -n "${ASH_DISABLED:-}" ]] && return
+
+  # Prevent users from manually invoking this function from the command line.
+  [[ "${ASH:-0}" == "0" ]] && ash::info ash::precmd && return
+
+  ash::log ${@:-0 0}
+  if typeset -p ASH_PROMPT_COMMAND &>/dev/null; then
+    "${ASH_PROMPT_COMMAND}"
+  fi
+  # Causes the exit code to be reset to what it was before logging.
+  local rval=${1:-0} && shift
+  ASH_PIPESTATUS=( ${@:-0} )
+  ${ASH_LOG_BIN} --exit ${rval}
+}
+
+
+##
+# Invoked by ash::log.
+#
+function ash::last_command() {
+  # Prevent users from manually invoking this function from the command line.
+  [[ "${ASH:-0}" == "0" ]] && ash::info ash::last_command && return
+
+  local cmd_no start_ts end_ts="$( date +%s )" cmd
+  read -r cmd_no start_ts cmd <<< "$( builtin history 1 )"
+  echo ${cmd_no:-0} ${start_ts:-0} ${end_ts:-0} "${cmd:-UNKNOWN}"
+}
+
+
+# Protect the functions.
+readonly -f ash::begin_session
+readonly -f ash::last_command
+readonly -f ash::precmd
+
+# Export functions used by subshells (not begin_session).
+#export -f ash::last_command
+#export -f ash::precmd
