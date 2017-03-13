@@ -81,7 +81,7 @@ source <( typeset -f precmd | sed -e 's/^precmd/ash::original_precmd/' )
 # has finished.
 #
 function precmd() {
-  ASH_PIPESTATUS=( ${?} ${pipestatus[@]} )
+  PIPEST_ASH=( ${?} ${pipestatus[@]} )
 
   if [[ -z ${ASH_DISABLED:-} ]]; then
     if [[ -z ${ASH_SESSION_ID:-} ]]; then
@@ -90,12 +90,12 @@ function precmd() {
         ${ASH_LOG_BIN} -a "${ASH_CFG_MOTD}session ${ASH_SESSION_ID}"
       fi
     else
-      ASH=1 ash::log ${ASH_PIPESTATUS[@]}
+      ASH=1 ash::log ${PIPEST_ASH[@]}
     fi
   fi
   ASH=1 ash::original_precmd
 
-  local rval=${ASH_PIPESTATUS[1]}
-  ASH_PIPESTATUS=( ${ASH_PIPESTATUS[2,-1]} )
+  local rval=${PIPEST_ASH[1]}
+  PIPEST_ASH=( ${PIPEST_ASH[2,-1]} )
   ${ASH_LOG_BIN} --exit ${rval:-1}
 }

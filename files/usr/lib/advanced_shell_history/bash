@@ -57,7 +57,8 @@ fi
 # Display error and abort if PROMPT_COMMAND is (already) readonly.
 if readonly -p | grep -q "^declare -[[:alpha:]]\+ PROMPT_COMMAND="; then
   if [[ "${PROMPT_COMMAND//ash::/}" == "${PROMPT_COMMAND}" ]]; then
-    ${ASH_LOG_BIN} -a "Make PROMPT_COMMAND writable to save advanced shell history."
+    ${ASH_LOG_BIN} -a \
+        "Make PROMPT_COMMAND writable to enable advanced shell history."
     return
   fi
 fi
@@ -107,7 +108,7 @@ function ash::precmd() {
   fi
   # Causes the exit code to be reset to what it was before logging.
   local rval=${1:-0} && shift
-  ASH_PIPESTATUS=( ${@:-0} )
+  PIPEST_ASH=( ${@:-0} )
   ${ASH_LOG_BIN} --exit ${rval}
 }
 
