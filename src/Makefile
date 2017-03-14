@@ -68,7 +68,7 @@ clean:
 # and keep the Makefile up-to-date.
 #
 Makefile: ${CPPS}
-	sed -i -e '/^# DEPENDENCIES:/q' Makefile
+	sed -i "" -e '/^# DEPENDENCIES:/q' Makefile
 	grep '^#include "' *.cpp \
 	  | sed -e 's/:#include / /;s:"::g' \
 	  | awk '{ \

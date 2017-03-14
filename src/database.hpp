@@ -28,8 +28,8 @@ using std::map;
 using std::string;
 using std::vector;
 
-class sqlite3;  // Forward declaration.
-class sqlite3_stmt;  // Forward declaration.
+struct sqlite3;  // Forward declaration.
+struct sqlite3_stmt;  // Forward declaration.
 
 namespace ash {
 
