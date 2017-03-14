@@ -1,5 +1,5 @@
 #
-#   Copyright 2012 Carl Anderson
+#   Copyright 2016 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,15 +13,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-VERSION := 0.7r0
+VERSION := 0.8r0
 VERSIONED := _ash_log.py advanced_shell_history/*.py ash_query.py
-ARGPARSE := advanced_shell_history/argparse.py
 
 .default: version
 
-version: ${ARGPARSE}
-	sed -i -e "s:^__version__ = .*:__version__ = '${VERSION}':" ${VERSIONED}
+version:
+	sed -i "" -e "s:^__version__ = .*:__version__ = '${VERSION}':" ${VERSIONED}
 
-${ARGPARSE}:
-	echo ./fetch_argparse.sh
-
+clean:
+	find . -type f -name '*.pyc' | xargs rm -f
