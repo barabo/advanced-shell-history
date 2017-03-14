@@ -37,7 +37,15 @@ new:	clean all
 version:
 	sed -i "" -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
 
-build_python: version
+filesystem: version
+	mkdir -p files/${BIN_DIR}
+	mkdir -p files/${ETC_DIR}
+	mkdir -p files/$LIB_DIR}/sh
+	mkdir -p files/${MAN_DIR}
+	chmod 755 files/${LIB_DIR}/sh
+	cp shell/* files/${LIB_DIR}/sh
+
+build_python: filesystem
 	@ printf "\nCompiling source code...\n"
 	@ cd python && make
 	find python -type f -name '*.py' | xargs chmod 555
@@ -45,7 +53,7 @@ build_python: version
 	cp -af python/advanced_shell_history/*.py files/${LIB_DIR}
 	find python -type f -name '*.py' | xargs chmod 775
 
-build_c: version
+build_c: filesystem
 	@ printf "\nCompiling source code...\n"
 	@ cd src && make
 	chmod 555 src/{_ash_log,ash_query}
