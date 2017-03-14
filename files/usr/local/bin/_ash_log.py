@@ -38,12 +38,6 @@ from advanced_shell_history import unix
 from advanced_shell_history import util
 
 
-def Print(*args, **kwargs):
-  print(*args, **kwargs)
-#  sys.stdout.write(*args, **kwargs)
-#  sys.stdout.write(os.linesep)
-
-
 class Flags(util.Flags):
   """The flags needed for the _ash_log.py script to work."""
 
@@ -201,7 +195,7 @@ def main(argv):
   if flags.get_session_id:
     if session_id is None:
       session_id = Session().Insert()
-    Print(session_id)
+    print(session_id)
 
   # Insert a new command into the database, if one was supplied.
   command_flag_used = bool(flags.command
