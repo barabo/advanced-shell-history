@@ -1,5 +1,5 @@
 #
-#   Copyright 2011 Carl Anderson
+#   Copyright 2017 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,8 +15,12 @@
 #
 
 REV := r0
-VERSION  := 0.7
+VERSION  := 0.8
+UPDATED  := 2017-03-14
 RVERSION := ${VERSION}${REV}
+ETC_DIR  := /usr/local/etc/advanced-shell-history
+LIB_DIR  := /usr/local/lib/advanced_shell_history
+BIN_DIR  := /usr/local/bin
 TMP_ROOT := /tmp
 TMP_DIR  := ${TMP_ROOT}/ash-${VERSION}
 TMP_FILE := ${TMP_DIR}.tar.gz
@@ -31,48 +35,44 @@ all:	build man
 new:	clean all
 
 version:
-	sed -i -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
+	sed -i "" -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
 
 build_python: version
 	@ printf "\nCompiling source code...\n"
 	@ cd python && make
-	chmod 555 python/*.py python/advanced_shell_history/*.py
-	cp -af python/*.py files/usr/local/bin
-	cp -af python/advanced_shell_history/*.py files/usr/local/lib/advanced_shell_history/
-	chmod 775 python/*.py python/*/*.py
+	find python -type f -name '*.py' | xargs chmod 555
+	cp -af python/*.py files/${BIN_DIR}
+	cp -af python/advanced_shell_history/*.py files/${LIB_DIR}
+	find python -type f -name '*.py' | xargs chmod 775
 
 build_c: version
 	@ printf "\nCompiling source code...\n"
 	@ cd src && make
-	chmod 555 src/_ash_log src/ash_query
-	cp -af src/_ash_log src/ash_query files/usr/local/bin
+	chmod 555 src/{_ash_log,ash_query}
+	cp -af src/{_ash_log,ash_query} files/${BIN_DIR}
 
 build: build_python build_c
 
 man:
 	@ printf "\nGenerating man pages...\n"
 	sed -e "s:__VERSION__:Version ${RVERSION}:" man/_ash_log.1 \
-	  | sed -e "s:__DATE__:$$( \
-	      stat -c %y man/_ash_log.1 \
-	        | cut -d' ' -f1 ):" \
+	  | sed -e "s:__DATE__:${UPDATED}:" \
 	  | gzip -9 -c > ./files${MAN_DIR}/_ash_log.1.gz
 	sed -e "s:__VERSION__:Version ${RVERSION}:" man/ash_query.1 \
-	  | sed -e "s:__DATE__:$$( \
-	      stat -c %y man/ash_query.1 \
-	        | cut -d' ' -f1 ):" \
+	  | sed -e "s:__DATE__:${UPDATED}:" \
 	  | gzip -9 -c > ./files${MAN_DIR}/ash_query.1.gz
 	cp -af ./files${MAN_DIR}/_ash_log.1.gz ./files${MAN_DIR}/_ash_log.py.1.gz
 	cp -af ./files${MAN_DIR}/ash_query.1.gz ./files${MAN_DIR}/ash_query.py.1.gz
 	chmod 644 ./files${MAN_DIR}/*ash*.1.gz
 
 fixperms:
-	chmod 644 files/usr/lib/advanced_shell_history/* files/etc/ash/*
+	chmod 644 files/${LIB_DIR}/* files/${ETC_DIR}/*
 
 overlay.tar.gz: fixperms
 	@ cd files && \
 	sudo tar -cpzf ../overlay.tar.gz $$( \
 	  find . -type f -o -type l \
-	    | grep -v '\.svn' \
+	    | grep -v '\.git' \
 	)
 
 install: build man overlay.tar.gz uninstall
@@ -94,12 +94,12 @@ install_c: build_c man overlay.tar.gz uninstall
 
 uninstall:
 	@ printf "\nUninstalling Advanced Shell History...\n"
-	sudo rm -rf /etc/ash /usr/lib/advanced_shell_history
-	sudo rm -f /usr/local/bin/_ash_log /usr/local/bin/ash_query
-	sudo rm -f /usr/local/bin/_ash_log.py /usr/local/bin/ash_query.py
-	sudo rm -f ${MAN_DIR}/_ash_log.1.gz ${MAN_DIR}/ash_query.1.gz
-	sudo rm -f ${MAN_DIR}/_ash_log.py.1.gz ${MAN_DIR}/ash_query.py.1.gz
-	sudo rm -f ${MAN_DIR}/advanced_shell_history
+#	sudo rm -rf ${ETC_DIR} ${LIB_DIR}
+#	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}
+#	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}.py
+#	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.1.gz
+#	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.py.1.gz
+#	sudo rm -f ${MAN_DIR}/advanced_shell_history
 
 tarball:
 	mkdir -p ${TMP_DIR}
@@ -113,21 +113,12 @@ src_tarball_minimal: mrproper tarball
 src_tarball: clean tarball
 	mv ${TMP_FILE} ${SRC_DEST}/ash-${RVERSION}.tar.gz
 
-mrproper: clean
-	rm -f python/advanced_shell_history/argparse.py
-
 clean:	version
 	@ printf "\nCleaning temp and trash files...\n"
 	cd src && make distclean
-	rm -f files/usr/local/bin/_ash_log*
-	rm -f files/usr/local/bin/ash_query*
-	rm -f files/usr/local/lib/advanced_shell_history/util.py
-	rm -f files/usr/local/lib/advanced_shell_history/__init__.py
-	rm -f files/usr/local/lib/advanced_shell_history/unix.py
-	rm -f files/usr/local/lib/advanced_shell_history/argparse.py
-	rm -f files/usr/share/man/man1/_ash_log.py.1.gz
-	rm -f files/usr/share/man/man1/_ash_log.1.gz
-	rm -f files/usr/share/man/man1/ash_query.1.gz
-	rm -f files/usr/share/man/man1/ash_query.py.1.gz
-	rm -f python/advanced_shell_history/*.pyc
+	rm -f files/${BIN_DIR}/_ash_log*
+	rm -f files/${BIN_DIR}/ash_query*
+	rm -f files/${LIB_DIR}/*.py
+	rm -f files/${MAN_DIR}/*.gz
+	find python -type f -name '*.pyc' | xargs rm -f
 	rm -rf ${TMP_DIR} ${TMP_FILE} overlay.tar.gz
