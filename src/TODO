@@ -1,4 +1,8 @@
 TODO
+  [ ] Cmake
+  [ ] unit tests.
+  [ ] update syntax to C++-11 standards.
+  [ ] use a sqlite3 shared object instead of using the amalgamation.
   [ ] generate a doxyfile for code documentation and add to the master Makefile a 'make docs' target.
   [ ] add more logging throughout the system.
   [ ] add an option for a formatter that includes visible pipe separators between aligned columns
@@ -9,6 +13,7 @@ TODO
   [ ] 
 
 database.cpp
+  [ ] revert back to using non-monotonic time
   [ ] 
 
 _ash_log.cpp
