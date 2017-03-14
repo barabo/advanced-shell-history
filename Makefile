@@ -40,10 +40,11 @@ version:
 filesystem: version
 	mkdir -p files/${BIN_DIR}
 	mkdir -p files/${ETC_DIR}
-	mkdir -p files/$LIB_DIR}/sh
+	mkdir -p files/${LIB_DIR}/sh
 	mkdir -p files/${MAN_DIR}
-	chmod 755 files/${LIB_DIR}/sh
-	cp shell/* files/${LIB_DIR}/sh
+	chmod 755 files/${LIB_DIR}/sh files/${ETC_DIR}
+	cp -a shell/* files/${LIB_DIR}/sh
+	cp -a config queries files/${ETC_DIR}
 
 build_python: filesystem
 	@ printf "\nCompiling source code...\n"
@@ -124,9 +125,9 @@ src_tarball: clean tarball
 clean:	version
 	@ printf "\nCleaning temp and trash files...\n"
 	cd src && make distclean
-	rm -f files/${BIN_DIR}/_ash_log*
-	rm -f files/${BIN_DIR}/ash_query*
-	rm -f files/${LIB_DIR}/*.py
-	rm -f files/${MAN_DIR}/*.gz
+	rm -rf files/${BIN_DIR}
+	rm -rf files/${ETC_DIR}
+	rm -rf files/${LIB_DIR}
+	rm -rf files/${MAN_DIR}
 	find python -type f -name '*.pyc' | xargs rm -f
 	rm -rf ${TMP_DIR} ${TMP_FILE} overlay.tar.gz
