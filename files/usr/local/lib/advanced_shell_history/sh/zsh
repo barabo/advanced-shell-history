@@ -25,7 +25,7 @@ if ! ps ho command $$ | grep -q "zsh"; then
 fi
 
 # Use the default config file if one was not specified.
-ASH_CFG="${ASH_CFG:-/etc/ash/ash.conf}"
+ASH_CFG="${ASH_CFG:-/usr/local/etc/advanced-shell-history/config}"
 
 # Source the config files to set all ASH_ shell variables.
 set -a

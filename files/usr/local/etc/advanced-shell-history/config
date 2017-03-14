@@ -1,5 +1,5 @@
 #
-#   Copyright 2011 Carl Anderson
+#   Copyright 2017 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@
 # Setup:
 #
 # ASH_CFG_LIB - The directory containing the sourced shell code.
-# Default: '/usr/lib/advanced_shell_history'
-ASH_CFG_LIB='/usr/lib/advanced_shell_history'
+# Default: '/usr/local/lib/advanced_shell_history/sh'
+ASH_CFG_LIB='/usr/local/lib/advanced_shell_history/sh'
 
 
 #
@@ -79,6 +79,9 @@ ASH_CFG_LOG_DATE_FMT='%Y-%m-%d %H:%M:%S %Z: '
 
 # ASH_CFG_DEFAULT_FORMATTER - The format used to display ash_query results.
 ASH_CFG_DEFAULT_FORMAT='auto'  # Default: auto
+
+# ASH_CFG_SYSTEM_QUERY_FILE - The system-wide file of available queries.
+ASH_CFG_SYSTEM_QUERY_FILE='/usr/local/etc/advanced-shell-history/queries'
 
 
 #

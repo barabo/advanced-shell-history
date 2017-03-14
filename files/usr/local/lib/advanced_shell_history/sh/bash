@@ -32,7 +32,7 @@ if ! ps ho command $$ | grep -q "bash"; then
 fi
 
 # Use the default config file if one was not specified.
-export ASH_CFG="${ASH_CFG:-/usr/local/etc/advanced-shell-history/ash.conf}"
+export ASH_CFG="${ASH_CFG:-/usr/local/etc/advanced-shell-history/config}"
 
 # Source the config files to set all ASH_ shell variables, exporting them.
 set -a
