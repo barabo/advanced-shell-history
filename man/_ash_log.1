@@ -1,5 +1,5 @@
 .\"
-.\"Copyright 2011 Carl Anderson
+.\"Copyright 2016 Carl Anderson
 .\"
 .\"Licensed under the Apache License, Version 2.0 (the "License");
 .\"you may not use this file except in compliance with the License.
@@ -75,12 +75,12 @@ file so it is automatically started with each new session.
 
 .B For bash, add this to your ~/.bashrc file:
 .RS
-source /usr/lib/advanced_shell_history/bash
+source /usr/local/lib/advanced_shell_history/sh/bash
 .RE
 
 .B For zsh, add this to your ~/.zshrc file:
 .RS
-source /usr/lib/advanced_shell_history/zsh
+source /usr/local/lib/advanced_shell_history/sh/zsh
 .RE
 
 
@@ -165,16 +165,16 @@ for user-written queries.
 .I ~/.ash/history.db
 .RS
 The default location for the sqlite3 database holding command history.  See
-http://code.google.com/p/advanced-shell-history/w for more details on how
+https://github.com/barabo/advanced-shell-history/w for more details on how
 the data is stored internally and other tips for querying the data.
 .RE
 
-.I /usr/lib/advanced_shell_history/bash
+.I /usr/local/lib/advanced_shell_history/sh/bash
 .RS
 Sourced for bash sessions.
 .RE
 
-.I /usr/lib/advanced_shell_history/zsh
+.I /usr/local/lib/advanced_shell_history/sh/zsh
 .RS
 Sourced for zsh sessions.
 .RE
@@ -198,7 +198,7 @@ suppressed in this case.
 
 .IP ASH_CFG_HISTORY_DB
 The default database to query.  This is set by sourcing one of the shell
-scripts in /usr/lib/advanced_shell_history and signifies the location
+scripts in /usr/local/lib/advanced_shell_history/sh and signifies the location
 of the database where commands are logged.  If this variable exists, the
 --database flag does not need to be used.
 
@@ -245,8 +245,8 @@ to query history
 
 
 .SH AUTHOR
-Carl Anderson, Google Inc.
+Carl Anderson, Health Catalyst, Inc.
 
 
 .SH BUGS
-Report bugs at http://code.google.com/p/advanced-shell-history/issues
+Report bugs at https://github.com/barabo/advanced-shell-history/issues
