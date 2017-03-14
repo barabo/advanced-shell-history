@@ -21,10 +21,9 @@ user-defined queries.
 
 TOOD(cpa): add logging to this at some point.
 """
+from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-
-# NOTE: This variable is set automatically by the Makefile.
 __version__ = '0.7r0'
 
 
@@ -66,8 +65,8 @@ class Flags(util.Flags):
 class Queries(object):
   """A class to store all the queries available to ash_query.py.
 
-  Queries are parsed from /etc/ash/queries and ~/.ash/queries and made available
-  to the command line utility.
+  Queries are parsed from /usr/local/etc/advanced-shell-history/queries and
+  ~/.ash/queries and are made available to the command line utility.
 
   TODO(cpa): if there is an error in the file, something should be printed.
   """
@@ -93,10 +92,12 @@ class Queries(object):
   def Init(cls):
     if cls.queries: return
 
-    # Load the queries from /etc/ash/queries and ~/.ash/queries
+    # Load the queries from the system query file, and also the user file.
     data = []
-    for filename in ('/etc/ash/queries', os.getenv('HOME') + '/.ash/queries'):
-      if not os.path.exists(filename): continue
+    system_queries = util.Config().GetString('SYSTEM_QUERY_FILE')
+    user_queries = os.path.join(os.getenv('HOME'), '.ash', 'queries')
+    for filename in (system_queries, user_queries):
+      if not filename or not os.path.exists(filename): continue
       lines = [x for x in open(filename).readlines() if x and x[0] != '#']
       data.extend([x[:-1] for x in lines if x[:-1]])
 
@@ -170,8 +171,8 @@ class AlignedFormatter(Formatter):
     widths = Formatter.GetWidths(rows)
     fmt = Formatter.separator.join(['%%%ds' % -width for width in widths])
     for row in rows:
-      print fmt % tuple(row)
-  
+      print(fmt % tuple(row))
+
   def Print(self, rs):
     AlignedFormatter.PrintRows(rs)
 
@@ -186,10 +187,10 @@ class AutoFormatter(Formatter):
 
     Store area of output after simulating grouping at each level successively.
     the rightmost minimum area will be chosen.
-   
+
     For example, consider the following areas after simulating grouping:
       areas = [100, 90, 92, 90, 140, 281]
-   
+
     With 1 level of grouping and with 3 levels of grouping we get the same
     screen area, however the rightmost value is chosen, so the return value
     will be 3.
@@ -211,7 +212,7 @@ class AutoFormatter(Formatter):
           length += 1
           prev = row[c]
 
-      # To calculate the new width, we need to consider both the width of the 
+      # To calculate the new width, we need to consider both the width of the
       # grouped column and the width of the remaining columns.  We also need to
       # consider the width of the indent.
       width = max(width - widths[c], widths[c]) + XX * (c + 1)
@@ -243,7 +244,7 @@ class AutoFormatter(Formatter):
         else:
           parts = ['%%%ds' % -w for w in widths[c:-1]] + ['%s']
           fmt = Formatter.separator.join(parts)
-          print fmt % rs[0][c:]
+          print(fmt % rs[0][c:])
           break
 
     # Print the result set values.
@@ -267,7 +268,7 @@ class AutoFormatter(Formatter):
           # Normal case: non-grouped columns.
           parts = ['%%%ds' % -w for w in widths[c:-1]] + ['%s']
           fmt = Formatter.separator.join(parts)
-          print fmt % tuple(row)[c:]
+          print(fmt % tuple(row)[c:])
           break
 
 
@@ -291,13 +292,13 @@ class NullFormatter(Formatter):
     if not Formatter.show_headings:
       rs = rs[1:]
     for row in rs:
-      print '\0'.join([str(x) for x in row])
+      print('\0'.join([str(x) for x in row]))
 
 
 def InitFormatters():
   """Create instances of each Formatter available to ash_query.py."""
   AlignedFormatter('aligned', 'Columns are aligned and separated with spaces.')
-  AutoFormatter('auto', 'TODO(cpa): Automatically group redundant values.')
+  AutoFormatter('auto', 'Redundant values are automatically grouped.')
   CSVFormatter('csv', 'Columns are comma separated with strings quoted.')
   NullFormatter('null', 'Columns are null separated with strings unquoted.')
 
@@ -333,13 +334,13 @@ def main(argv):
   elif flags.print_query:
     raw, sql = Queries.Get(flags.print_query)
     if not raw:
-      print >> sys.stderr, 'Query not found: %s' % flags.print_query
+      sys.stderr.write('Query not found: %s\n' % flags.print_query)
       return 1
     if raw.strip() != sql.strip():
-      print 'Query: %s\nTemplate Form:\n%s\nActual SQL:\n%s' % (
-          flags.print_query, raw, sql)
+      msg = 'Query: %s\nTemplate Form:\n%s\nActual SQL:\n%s'
+      print(msg % (flags.print_query, raw, sql))
     else:
-      print 'Query: %s\n%s' % (flags.print_query, sql)
+      print('Query: %s\n%s' % (flags.print_query, sql))
 
   elif flags.query:
     # Get the formatter to be used to print the result set.
@@ -347,7 +348,7 @@ def main(argv):
     format_name = flags.format or default
     fmt = Formatter.Get(format_name)
     if not fmt:
-      print >> sys.stderr, 'Unknown format: %s' % format_name
+      sys.stderr.write('Unknown format: %s\n' % format_name)
       return 1
 
     sql = Queries.Get(flags.query)[1]
@@ -359,4 +360,3 @@ def main(argv):
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
-

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2012 Carl Anderson
+# Copyright 2017 Carl Anderson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@
 This module logs a command into a command history database, while also gathering
 system-specific metadata.
 """
+from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-
-# NOTE: This variable is set automatically by the Makefile.
 __version__ = '0.7r0'
 
 
@@ -35,8 +34,8 @@ _LIB = '/usr/local/lib'
 if _LIB not in sys.path:
   sys.path.append(_LIB)
 
-from advanced_shell_history import util
 from advanced_shell_history import unix
+from advanced_shell_history import util
 
 
 class Flags(util.Flags):
@@ -184,7 +183,7 @@ def main(argv):
   # Print an alert if one was specified.
   flags = Flags()
   if flags.alert:
-    print >> sys.stderr, flags.alert
+    print(flags.alert, file=sys.stderr)
 
   # If no arguments were given, it may be best to show --help.
   if len(argv) == 1 and not util.Config().GetBool('HIDE_USAGE_FOR_NO_ARGS'):
@@ -195,7 +194,7 @@ def main(argv):
   if flags.get_session_id:
     if session_id is None:
       session_id = Session().Insert()
-    print session_id
+    print(session_id)
 
   # Insert a new command into the database, if one was supplied.
   command_flag_used = bool(flags.command

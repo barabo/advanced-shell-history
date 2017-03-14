@@ -1,6 +1,5 @@
-#!/usr/bin/python
 #
-# Copyright 2012 Carl Anderson
+# Copyright 2017 Carl Anderson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +20,6 @@ logging, flag parsing, configuration and database management.
 """
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-
-# NOTE: This variable is set automatically by the Makefile.
 __version__ = '0.7r0'
 
 

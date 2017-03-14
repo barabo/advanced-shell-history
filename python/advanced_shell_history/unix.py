@@ -1,6 +1,5 @@
-#!/usr/bin/python
 #
-# Copyright 2012 Carl Anderson
+# Copyright 2017 Carl Anderson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +19,13 @@ import os
 import pwd
 import re
 import socket
+import subprocess
 import sys
 import time
+
+
+class Error(Exception):
+  pass
 
 
 def GetCWD():
@@ -52,7 +56,7 @@ def _GetIfconfig():
         shell=True,
         bufsize=8000,
         stdout=subprocess.PIPE).stdout
-    return [x.lower().rstrip() for x in fd.readlines()]
+    return [x.lower().rstrip().decode('utf-8') for x in fd.readlines()]
   except Error:
     return None
 
@@ -149,4 +153,3 @@ def GetTTY():
 def GetUID():
   """Returns the UID of the command."""
   return os.getuid()
-
