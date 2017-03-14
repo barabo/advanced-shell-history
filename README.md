@@ -83,4 +83,4 @@ Bugs:
   * the python version is about 10x slower than the C++ version
 
 Author: carl.anderson@gmail.com (Carl Anderson)
-Last Update: 2012-08-06
+Last Update: 2017-03-14

@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-VERSION := 0.7r0
+VERSION := 0.8r0
 LOGGER	:= _ash_log
 QUERIER	:= ash_query
 EXES	:= ${LOGGER} ${QUERIER}
