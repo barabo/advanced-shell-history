@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #
 #
 #   Copyright 2012 Carl Anderson
@@ -29,32 +29,33 @@ set -u
 # From the directory where this script lives:
 cd ${0%/*}
 
-# Fetch the argparse library, if needed on this system.
-[ -e advanced_shell_history/argparse.py ] || ./fetch_argparse.sh
-
 # Taken from the master makefile.
-REV="$( svn up | cut -d' ' -f3 | cut -d. -f1 | sed -e 's:^:.r:' )"
+REV="r0"
 VERSION="$( grep '^VERSION[ ]*:=[ ]*' ../Makefile | awk '{ print $3 }' )"
 RVERSION="${VERSION:-0}${REV:-}"
 
+DEST_DIR="/Applications/Advanced Shell History/Contents/Resources/python/advanced_shell_history"
+
 # Taken from the python/Makefile version target.
-sed -i -e "s:^__version__ = .*:__version__ = '${RVERSION}':" \
+sed -i "" -e "s:^__version__ = .*:__version__ = '${RVERSION}':" \
   _ash_log.py \
   advanced_shell_history/*.py \
   ash_query.py
 
 # From the parent directory, prepare the overlay for /
 cd ..
+mkdir -p files/"${DEST_DIR}"
+rm -rf files/usr/lib
 
 # Taken from the makefile build_python target.
 chmod 555 python/*.py python/advanced_shell_history/*.py
 cp -af python/*.py files/usr/local/bin
 cp -af python/advanced_shell_history/*.py \
-  files/usr/local/lib/advanced_shell_history/
+  "files/${DEST_DIR}"
 chmod 775 python/*.py python/*/*.py
 
 # Taken from the makefile fixperms target.
-chmod 644 files/usr/lib/advanced_shell_history/* files/etc/ash/*
+chmod 644 "files/${DEST_DIR}"/* files/etc/ash/*
 
 # Taken from the makefile man pages target.
 MAN_DIR=/usr/share/man/man1
@@ -73,15 +74,12 @@ chmod 644 ./files${MAN_DIR}/*ash*.1.gz
 
 # Taken from the makefile overlay.tar.gz target.
 cd files
-sudo tar -cpzf ../overlay.tar.gz $( \
-  find . -type f -o -type l \
-    | grep -v '\.svn' \
-)
+sudo tar -cpzf ../overlay.tar.gz *
 cd -
 
 # Taken from master makefile uninstall target.
 printf "\nUninstalling Advanced Shell History...\n"
-sudo rm -rf /usr/lib/advanced_shell_history
+sudo rm -rf "${DEST_DIR}"
 sudo rm -f /usr/local/bin/_ash_log.py /usr/local/bin/ash_query.py
 sudo rm -f ${MAN_DIR}/_ash_log.1.py.gz ${MAN_DIR}/ash_query.1.py.gz
 sudo rm -f ${MAN_DIR}/advanced_shell_history
@@ -93,9 +91,8 @@ if [[ "${1:-}" == "--uninstall" ]]; then
 fi
 
 # Taken from the master makefile install_python target.
-BEGIN_URL="http://code.google.com/p/advanced-shell-history/wiki/HOWTO_Begin"
+BEGIN_URL="https://github.com/barabo/advanced-shell-history/wiki/HOWTO_Begin"
 printf "\nInstalling Python Advanced Shell History...\n"
 echo -e "\nInstalling files:"
 sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
 printf "\n 0/ - Install completed!\n<Y    See: ${BEGIN_URL}\n/ \\ \n"
-
