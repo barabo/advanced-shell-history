@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#   Copyright 2011 Carl Anderson
+#   Copyright 2017 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -28,17 +28,23 @@ fi
 ASH_CFG="${ASH_CFG:-/etc/ash/ash.conf}"
 
 # Source the config files to set all ASH_ shell variables.
-source <( grep "^[ ]*ASH_[A-Za-z_0-9]*=['\"].*['\"].*$" "${ASH_CFG}" \
-            | tr -cd '\11\12\15\40-\176' ) || exit 1
-
-export $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
+set -a
+source "${ASH_CFG}" || exit 1
+set +a
 
 # Make the env config options read-only if that option is set.
 if [[ "${ASH_CFG_READONLY_ENV:-0}" != "0" ]]; then
   readonly $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
 fi
 
-source "${ASH_CFG_LIB}/common" &>/dev/null || exit 1
+# Source the common libraries, or complain about it in the terminal.
+if [[ -e "${ASH_CFG_LIB}"/common ]]; then
+  source "${ASH_CFG_LIB}/common" || exit 1
+elif [[ -e "${ASH_CFG_LIB}" ]]; then
+  echo "advanced-shell-history ERROR: Can't find common in $ASH_CFG_LIB"
+else
+  echo "advanced-shell-history ERROR: Can't find ASH_CFG_LIB='$ASH_CFG_LIB'"
+fi
 
 
 #
@@ -81,7 +87,7 @@ source <( typeset -f precmd | sed -e 's/^precmd/ash::original_precmd/' )
 # has finished.
 #
 function precmd() {
-  PIPEST_ASH=( ${?} ${pipestatus[@]} )
+  pipest_ash=( ${?} ${pipestatus[@]} )
 
   if [[ -z ${ASH_DISABLED:-} ]]; then
     if [[ -z ${ASH_SESSION_ID:-} ]]; then
@@ -90,12 +96,12 @@ function precmd() {
         ${ASH_LOG_BIN} -a "${ASH_CFG_MOTD}session ${ASH_SESSION_ID}"
       fi
     else
-      ASH=1 ash::log ${PIPEST_ASH[@]}
+      ASH=1 ash::log ${pipest_ash[@]}
     fi
   fi
   ASH=1 ash::original_precmd
 
-  local rval=${PIPEST_ASH[1]}
-  PIPEST_ASH=( ${PIPEST_ASH[2,-1]} )
+  local rval=${pipest_ash[1]}
+  pipest_ash=( ${pipest_ash[2,-1]} )
   ${ASH_LOG_BIN} --exit ${rval:-1}
 }

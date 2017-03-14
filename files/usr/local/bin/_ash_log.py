@@ -19,6 +19,7 @@
 This module logs a command into a command history database, while also gathering
 system-specific metadata.
 """
+from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
 __version__ = '0.7r0'
@@ -38,8 +39,9 @@ from advanced_shell_history import util
 
 
 def Print(*args, **kwargs):
-  sys.stdout.write(*args, **kwargs)
-  sys.stdout.write(os.linesep)
+  print(*args, **kwargs)
+#  sys.stdout.write(*args, **kwargs)
+#  sys.stdout.write(os.linesep)
 
 
 class Flags(util.Flags):

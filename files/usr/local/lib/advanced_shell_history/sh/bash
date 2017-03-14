@@ -32,13 +32,12 @@ if ! ps ho command $$ | grep -q "bash"; then
 fi
 
 # Use the default config file if one was not specified.
-export ASH_CFG="${ASH_CFG:-/etc/ash/ash.conf}"
+export ASH_CFG="${ASH_CFG:-/usr/local/etc/advanced-shell-history/ash.conf}"
 
-# Source the config files to set all ASH_ shell variables.
+# Source the config files to set all ASH_ shell variables, exporting them.
+set -a
 source "${ASH_CFG}"
-
-# Export all sourced ASH_ variables.
-export $( sed -n -e "/^[ ]*ASH_[A-Za-z_0-9]*=.*/s:=.*::p" "${ASH_CFG}" )
+set +a
 
 # Make the env config options read-only if that option is set.
 if [[ "${ASH_CFG_READONLY_ENV:-0}" != "0" ]]; then
@@ -74,6 +73,9 @@ readonly HISTCONTROL
 export HISTTIMEFORMAT="%s "
 readonly HISTTIMEFORMAT
 
+# Cause bash to log commands immediately, rather than upon shell exit.
+shopt -s histappend
+
 
 ##
 # This is invoked when a new user session begins.
@@ -103,6 +105,7 @@ function ash::precmd() {
   [[ "${ASH:-0}" == "0" ]] && ash::info ash::precmd && return
 
   ash::log ${@:-0 0}
+  history -a
   if typeset -p ASH_PROMPT_COMMAND &>/dev/null; then
     "${ASH_PROMPT_COMMAND}"
   fi

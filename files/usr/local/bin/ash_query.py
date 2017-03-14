@@ -21,6 +21,7 @@ user-defined queries.
 
 TOOD(cpa): add logging to this at some point.
 """
+from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
 __version__ = '0.7r0'
@@ -37,11 +38,6 @@ if _LIB not in sys.path:
   sys.path.append(_LIB)
 
 from advanced_shell_history import util
-
-
-def Print(*args, **kwargs):
-  sys.stdout.write(*args, **kwargs)
-  sys.stdout.write(os.linesep)
 
 
 class Flags(util.Flags):
@@ -98,7 +94,9 @@ class Queries(object):
 
     # Load the queries from /etc/ash/queries and ~/.ash/queries
     data = []
-    for filename in ('/etc/ash/queries', os.getenv('HOME') + '/.ash/queries'):
+    # TODO(carl): get this from the environment variable.
+    system_queries = '/usr/local/etc/advanced-shell-history/queries'
+    for filename in (system_queries, os.getenv('HOME') + '/.ash/queries'):
       if not os.path.exists(filename): continue
       lines = [x for x in open(filename).readlines() if x and x[0] != '#']
       data.extend([x[:-1] for x in lines if x[:-1]])
@@ -173,7 +171,7 @@ class AlignedFormatter(Formatter):
     widths = Formatter.GetWidths(rows)
     fmt = Formatter.separator.join(['%%%ds' % -width for width in widths])
     for row in rows:
-      Print(fmt % tuple(row))
+      print(fmt % tuple(row))
 
   def Print(self, rs):
     AlignedFormatter.PrintRows(rs)
@@ -246,7 +244,7 @@ class AutoFormatter(Formatter):
         else:
           parts = ['%%%ds' % -w for w in widths[c:-1]] + ['%s']
           fmt = Formatter.separator.join(parts)
-          Print(fmt % rs[0][c:])
+          print(fmt % rs[0][c:])
           break
 
     # Print the result set values.
@@ -270,7 +268,7 @@ class AutoFormatter(Formatter):
           # Normal case: non-grouped columns.
           parts = ['%%%ds' % -w for w in widths[c:-1]] + ['%s']
           fmt = Formatter.separator.join(parts)
-          Print(fmt % tuple(row)[c:])
+          print(fmt % tuple(row)[c:])
           break
 
 
@@ -294,7 +292,7 @@ class NullFormatter(Formatter):
     if not Formatter.show_headings:
       rs = rs[1:]
     for row in rs:
-      Print('\0'.join([str(x) for x in row]))
+      print('\0'.join([str(x) for x in row]))
 
 
 def InitFormatters():
@@ -340,9 +338,9 @@ def main(argv):
       return 1
     if raw.strip() != sql.strip():
       msg = 'Query: %s\nTemplate Form:\n%s\nActual SQL:\n%s'
-      Print(msg % (flags.print_query, raw, sql))
+      print(msg % (flags.print_query, raw, sql))
     else:
-      Print('Query: %s\n%s' % (flags.print_query, sql))
+      print('Query: %s\n%s' % (flags.print_query, sql))
 
   elif flags.query:
     # Get the formatter to be used to print the result set.
