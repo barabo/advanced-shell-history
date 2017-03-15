@@ -26,6 +26,7 @@ TMP_DIR  := ${TMP_ROOT}/ash-${VERSION}
 TMP_FILE := ${TMP_DIR}.tar.gz
 MAN_DIR  := /usr/share/man/man1
 SRC_DEST := ..
+SHELL    := /bin/bash
 
 BEGIN_URL := https://github.com/barabo/advanced-shell-history
 
@@ -35,7 +36,7 @@ all:	build man
 new:	clean all
 
 version:
-	sed -i "" -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
+	sed -i -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
 
 filesystem: version
 	mkdir -p files/${BIN_DIR}
