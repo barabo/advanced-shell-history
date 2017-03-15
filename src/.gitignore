@@ -1,2 +1,5 @@
 *.o
 
+
+/_ash_log
+/ash_query
