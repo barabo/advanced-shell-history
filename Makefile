@@ -26,6 +26,7 @@ TMP_DIR  := ${TMP_ROOT}/ash-${VERSION}
 TMP_FILE := ${TMP_DIR}.tar.gz
 MAN_DIR  := /usr/share/man/man1
 SRC_DEST := ..
+SHELL    := /bin/bash
 
 BEGIN_URL := https://github.com/barabo/advanced-shell-history
 
