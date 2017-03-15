@@ -36,7 +36,7 @@ all:	build man
 new:	clean all
 
 version:
-	sed -i "" -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
+	sed -i -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
 
 filesystem: version
 	mkdir -p files/${BIN_DIR}

@@ -19,7 +19,7 @@ VERSIONED := _ash_log.py advanced_shell_history/*.py ash_query.py
 .default: version
 
 version:
-	sed -i "" -e "s:^__version__ = .*:__version__ = '${VERSION}':" ${VERSIONED}
+	sed -i -e "s:^__version__ = .*:__version__ = '${VERSION}':" ${VERSIONED}
 
 clean:
 	find . -type f -name '*.pyc' | xargs rm -f
