@@ -1,14 +1,14 @@
 title Shell Command Sequence Diagram
 
 note over You,bash,OS,ASH: Install Advanced Shell History
-You->OS: New shell started.
-OS->bash:
+You->OS: User login.
+OS->bash: bash startup sequence.
 note over bash
   Sources ~/.bashrc
   Sources /usr/local/lib/advanced_shell_history/sh/bash
   Sets PROMPT_COMMAND=_ash_log
 end note
-
+bash->You: Wait for user.
 loop Interactive Shell.
 
 note over You: Type a command.
@@ -23,16 +23,21 @@ OS->bash: Command exits.
 note over bash: Env Variables are set: $?, $PIPESTATUS
 
 bash->ASH: PROMPT_COMMAND executed.
-note over ASH: Command end time is logged.
+note over ASH
+  Command end time is noted.
+  PIPEST_ASH is updated.
+end note
+
 alt If PROMPT_COMMAND was defined before ASH
   ASH->bash: Original PROMPT_COMMAND executed.
-  bash->OS:
-  OS->bash:
-  bash->ASH:
+  bash->OS: Execute.
+  OS->bash: Exit.
+  bash->ASH: Sets $?, $PIPESTATUS
 end
-note over ASH: Command is saved to history.db.
-ASH->bash: Env Variables are restored: $?, $PIPEST_ASH.
-bash->OS:
-OS->bash:
+
+ASH->bash: _ash_log invoked.
+bash->OS: _ash_log executes.
+note over OS: Command is saved to history.db.
+OS->bash: Original $? is restored.
 bash->You: New prompt is displayed.
 end
