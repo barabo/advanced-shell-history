@@ -1,28 +1,38 @@
 title Shell Command Sequence Diagram
 
-note left of You: Install Advanced Shell History
-note left of ASH: Sets PROMPT_COMMAND=_ash_log
+note over You,bash,OS,ASH: Install Advanced Shell History
+You->OS: New shell started.
+OS->bash:
+note over bash
+  Sources ~/.bashrc
+  Sources /usr/local/lib/advanced_shell_history/sh/bash
+  Sets PROMPT_COMMAND=_ash_log
+end note
 
-note left of You: Type a command.
-You->Shell: Press Enter
-note left of Shell: Parses command.
-note left of Shell: Command start time is logged.
-Shell->OS: Execute command.
-note left of OS: Command runs.
-OS->Shell: Command completes.
-note left of Shell: Env Variables are set: $?, $PIPESTATUS
+loop Interactive Shell.
 
-Shell->ASH: PROMPT_COMMAND executed.
-note left of ASH: Command end time is logged.
-alt Optional (if a PROMPT_COMMAND existed before installing Advanced Shell History)
-  ASH->Shell: Original PROMPT_COMMAND executed.
-  Shell->OS:
-  OS->Shell:
-  Shell->ASH:
+note over You: Type a command.
+You->bash: Press Enter
+note over bash
+  Parses command.
+  Command start time is logged.
+end note
+bash->OS: Execute command.
+note over OS: Command runs.
+OS->bash: Command exits.
+note over bash: Env Variables are set: $?, $PIPESTATUS
+
+bash->ASH: PROMPT_COMMAND executed.
+note over ASH: Command end time is logged.
+alt If PROMPT_COMMAND was defined before ASH
+  ASH->bash: Original PROMPT_COMMAND executed.
+  bash->OS:
+  OS->bash:
+  bash->ASH:
 end
-note left of ASH: Command is saved to history.db.
-ASH->Shell: Env Variables are restored: $?, $PIPEST_ASH.
-Shell->OS:
-OS->Shell:
-Shell->You: New prompt is displayed.
-note left of You: Ready for next command to be entered.
+note over ASH: Command is saved to history.db.
+ASH->bash: Env Variables are restored: $?, $PIPEST_ASH.
+bash->OS:
+OS->bash:
+bash->You: New prompt is displayed.
+end
