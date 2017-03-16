@@ -82,8 +82,10 @@ command.
     options necessary for the magic to work.
 
 ## Bugs
-  * doesn't capture exec'ed commands: example: exec rm /tmp/foo # is lost
-  * the python version is about 10x slower than the C++ version
+  * The C++ version does not compile in OSX because the CLOCK_MONOTONIC symbol is undefined.
+    * Use the python version for now.
+  * Doesn't capture exec'ed commands: example: `exec rm /tmp/foo # is lost`
+  * The python version is about 10x slower than the C++ version.
 
 ### Author
 carl.anderson@gmail.com (Carl Anderson)
