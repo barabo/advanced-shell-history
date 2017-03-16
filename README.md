@@ -61,6 +61,8 @@ However, if you currently DO use this feature, you can still use this program.
 The code renames your existing hook and invokes it after saving the previous
 command.
 
+### Diagram
+![Command Process Diagram](https://raw.githubusercontent.com/barabo/advanced-shell-history/master/docs/diagram.png)
 
 ## Caveats
   * this is not meant to be a security auditing tool - it's for user
@@ -71,8 +73,8 @@ command.
   * for zsh users, this overrides your `precmd` function.  The shell script
     attempts to rename your previous `precmd` function and continue to hook
     into it.
-  * all users will notice that the `PIPESTATUS` / pipestatus variables have
-    been renamed to `PIPEST_ASH`.  Because these variables are transient
+  * all users will notice that the `PIPESTATUS` / `pipestatus` variables have
+    been renamed to `PIPEST_ASH` / `pipest_ash`.  Because these variables are transient
     and logged, they cannot be easily restored.  Instead they are copied.
   * when you build this, the Makefile may download a version of sqlite3
     (if it's not already included in the tarball or the svn repo).
