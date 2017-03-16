@@ -1,6 +1,9 @@
 TODO
   [ ] determine the best way to install a local python library to the system path, so sys.path doesn't need to be patched.
   [ ] for OSX install, put files into /Applications/Advanced Shell History/Contents/Resources/python/advanced_shell_history
+  [ ] virtual environment support would be nice
+  [ ] profile for performance - the c++ version is 10x faster
+  [ ]
   [ ] database class
     (x) - open or create the database defined in the environment
     ( ) - time the DB writes and timeout if over the threshold

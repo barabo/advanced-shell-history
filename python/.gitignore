@@ -1,0 +1,2 @@
+# These files are created in OSX when using sed -i -e to inject versions.
+*.py-e

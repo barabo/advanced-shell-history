@@ -14,9 +14,9 @@
 #   limitations under the License.
 #
 
-REV := r0
+REV := r1
 VERSION  := 0.8
-UPDATED  := 2017-03-14
+UPDATED  := 2017-03-15
 RVERSION := ${VERSION}${REV}
 ETC_DIR  := /usr/local/etc/advanced-shell-history
 LIB_DIR  := /usr/local/lib/advanced_shell_history
@@ -29,15 +29,12 @@ SRC_DEST := ..
 
 BEGIN_URL := https://github.com/barabo/advanced-shell-history
 
-.PHONY: all build build_c build_python clean fixperms install install_c install_python man mrproper src_tarball src_tarball_minimal uninstall version
+.PHONY: all build build_c build_python clean fixperms install install_c install_python man mrproper src_tarball src_tarball_minimal uninstall
 all:	build man
 
 new:	clean all
 
-version:
-	sed -i "" -e "/^VERSION :=/s/:= .*/:= ${RVERSION}/" python/Makefile src/Makefile
-
-filesystem: version
+filesystem:
 	mkdir -p files/${BIN_DIR}
 	mkdir -p files/${ETC_DIR}
 	mkdir -p files/${LIB_DIR}/sh
@@ -48,7 +45,7 @@ filesystem: version
 
 build_python: filesystem
 	@ printf "\nCompiling source code...\n"
-	@ cd python && make
+	@ cd python && make VERSION="${RVERSION}"
 	find python -type f -name '*.py' | xargs chmod 555
 	cp -af python/*.py files/${BIN_DIR}
 	cp -af python/advanced_shell_history/*.py files/${LIB_DIR}
@@ -56,7 +53,7 @@ build_python: filesystem
 
 build_c: filesystem
 	@ printf "\nCompiling source code...\n"
-	@ cd src && make
+	@ cd src && make VERSION="${RVERSION}"
 	chmod 555 src/{_ash_log,ash_query}
 	cp -af src/{_ash_log,ash_query} files/${BIN_DIR}
 
@@ -103,17 +100,17 @@ install_c: build_c man overlay.tar.gz uninstall
 
 uninstall:
 	@ printf "\nUninstalling Advanced Shell History...\n"
-#	sudo rm -rf ${ETC_DIR} ${LIB_DIR}
-#	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}
-#	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}.py
-#	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.1.gz
-#	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.py.1.gz
-#	sudo rm -f ${MAN_DIR}/advanced_shell_history
+	sudo rm -ri ${ETC_DIR} ${LIB_DIR}
+	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}
+	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}.py
+	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.1.gz
+	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.py.1.gz
+	sudo rm -f ${MAN_DIR}/advanced_shell_history
 
 tarball:
 	mkdir -p ${TMP_DIR}
 	rsync -Ca * ${TMP_DIR}
-	cd ${TMP_ROOT} && tar -czpf ${TMP_FILE} ./ash-${VERSION}/
+	cd ${TMP_ROOT} && tar -czpf ${TMP_FILE} ./ash-${RVERSION}/
 	rm -rf ${TMP_DIR}
 
 src_tarball_minimal: mrproper tarball
@@ -122,7 +119,7 @@ src_tarball_minimal: mrproper tarball
 src_tarball: clean tarball
 	mv ${TMP_FILE} ${SRC_DEST}/ash-${RVERSION}.tar.gz
 
-clean:	version
+clean:
 	@ printf "\nCleaning temp and trash files...\n"
 	cd src && make distclean
 	rm -rf files/${BIN_DIR}

@@ -1,5 +1,5 @@
 #
-#   Copyright 2016 Carl Anderson
+#   Copyright 2017 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,13 +13,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-VERSION := 0.8r0
+
+# The VERSION variable is passed to this makefile from the main Makefile.
+VERSION := placeholder
 VERSIONED := _ash_log.py advanced_shell_history/*.py ash_query.py
 
 .default: version
 
 version:
-	sed -i "" -e "s:^__version__ = .*:__version__ = '${VERSION}':" ${VERSIONED}
+	sed -i -e "s:^__version__ = .*:__version__ = '${VERSION}':" ${VERSIONED}
 
 clean:
 	find . -type f -name '*.pyc' | xargs rm -f
+	find . -type f -name '*.py-e' | xargs rm -f

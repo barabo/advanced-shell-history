@@ -20,7 +20,7 @@ logging, flag parsing, configuration and database management.
 """
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-__version__ = '0.8r0'
+__version__ = '0.8r1'
 
 
 import argparse

@@ -24,7 +24,7 @@ TOOD(cpa): add logging to this at some point.
 from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-__version__ = '0.8r0'
+__version__ = '0.8r1'
 
 
 import csv

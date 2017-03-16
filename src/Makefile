@@ -1,5 +1,5 @@
 #
-#   Copyright 2011 Carl Anderson
+#   Copyright 2017 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
 #   limitations under the License.
 #
 
-VERSION := 0.8r0
+# The VERSION variable is passed to this makefile from the main Makefile.
+VERSION := placeholder
 LOGGER	:= _ash_log
 QUERIER	:= ash_query
 EXES	:= ${LOGGER} ${QUERIER}
@@ -22,7 +23,7 @@ OBJ_L	:= ${LOGGER}.o command.o config.o database.o flags.o logger.o session.o un
 OBJ_Q	:= ${QUERIER}.o command.o config.o database.o flags.o formatter.o logger.o session.o queries.o unix.o util.o
 OBJS	:= ${OBJ_L} ${OBJ_Q}
 CPPS	:= $(shell ls *.cpp)
-TRASH	:= ${OBJS} ${EXES} core
+TRASH	:= ${OBJS} ${EXES} core Makefile-e
 CPP	:= g++
 C	:= gcc
 FLAGS	:= -g -Wall -DASH_VERSION="\"${VERSION}\"" -ansi -pedantic -O2
@@ -68,7 +69,7 @@ clean:
 # and keep the Makefile up-to-date.
 #
 Makefile: ${CPPS}
-	sed -i "" -e '/^# DEPENDENCIES:/q' Makefile
+	sed -i -e '/^# DEPENDENCIES:/q' Makefile
 	grep '^#include "' *.cpp \
 	  | sed -e 's/:#include / /;s:"::g' \
 	  | awk '{ \

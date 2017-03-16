@@ -1,2 +1,10 @@
+# Ignore object files.
 *.o
 
+# These are the binaries we're building.
+_ash_log
+ash_query
+
+# This is an OSX wart.  This file is created when sed -i -e uses '-e' as the
+# extension for inplace backup extension.
+Makefile-e
