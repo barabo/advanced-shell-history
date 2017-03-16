@@ -1,0 +1,28 @@
+title Shell Command Sequence Diagram
+
+note left of You: Install Advanced Shell History
+note left of ASH: Sets PROMPT_COMMAND=_ash_log
+
+note left of You: Type a command.
+You->Shell: Press Enter
+note left of Shell: Parses command.
+note left of Shell: Command start time is logged.
+Shell->OS: Execute command.
+note left of OS: Command runs.
+OS->Shell: Command completes.
+note left of Shell: Env Variables are set: $?, $PIPESTATUS
+
+Shell->ASH: PROMPT_COMMAND executed.
+note left of ASH: Command end time is logged.
+alt Optional (if a PROMPT_COMMAND existed before installing Advanced Shell History)
+  ASH->Shell: Original PROMPT_COMMAND executed.
+  Shell->OS:
+  OS->Shell:
+  Shell->ASH:
+end
+note left of ASH: Command is saved to history.db.
+ASH->Shell: Env Variables are restored: $?, $PIPEST_ASH.
+Shell->OS:
+OS->Shell:
+Shell->You: New prompt is displayed.
+note left of You: Ready for next command to be entered.
