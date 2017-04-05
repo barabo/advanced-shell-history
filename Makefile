@@ -101,7 +101,7 @@ install_c: build_c man overlay.tar.gz uninstall
 
 uninstall:
 	@ printf "\nUninstalling Advanced Shell History...\n"
-	sudo rm -ri ${ETC_DIR} ${LIB_DIR}
+	sudo rm -ri ${ETC_DIR} ${LIB_DIR} || true
 	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}
 	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}.py
 	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.1.gz
