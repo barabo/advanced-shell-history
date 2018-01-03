@@ -43,6 +43,50 @@ Save your command line history in a sqlite3 DB!
   make install         # Installs both versions
 ```
 
+## Configure
+You will need to source a couple files in order for this to work by default.
+
+First, source the configuration file in `/usr/local/etc/advanced-shell-history/config`.
+This will define several environment variables that are needed for the logger and the
+query app.
+
+Next, export the `ASH_CFG_SYSTEM_QUERY_FILE` if you would like to use the systemwide
+queries!  Without this exported line, the `ash_query` command will not know where to find
+the queries needed to extract from the history database.
+
+Finally, you must source the shell code for your shell.  For example, `bash` users source
+`/usr/local/lib/advanced_shell_history/sh/bash` and `zsh` users source `/usr/local/lib/advanced_shell_history/sh/zsh`.
+
+Here's a snippet you can paste into your `~/.bashrc` file:
+```{sh}
+  source /usr/local/etc/advanced-shell-history/config
+  export ASH_CFG_SYSTEM_QUERY_FILE
+  source /usr/local/lib/advanced_shell_history/sh/bash
+```
+Remember to `source ~/.bashrc` after you modify it!
+
+## Kicking the Tires
+Once you have the hooks in place, you can confirm it's working by opening a new
+terminal and checking for history being logged.
+
+If you see the message `Advanced Shell History enabled: session 1` - congratulations!
+
+![Congratulations](https://raw.githubusercontent.com/barabo/advanced-shell-history/master/docs/ash-session.png)
+
+If you don't see the message above, make sure you are sourcing the correct files and 
+that they are installed as expected.
+
+Next, you should also be able to confirm that the `ash_query` command works by using
+the `-Q` flag.  The `-Q` flag lists all the available queries.
+
+![ash-query](https://raw.githubusercontent.com/barabo/advanced-shell-history/master/docs/ash-query.png)
+
+You can invoke a query using the `-q` flag (notice: lowercase) and passing a query
+name to go with it.  For example, `ash_query -q RCWD` will show all per-directory
+history rooted from the current working directory.
+
+![ash-rcwd](https://raw.githubusercontent.com/barabo/advanced-shell-history/master/docs/ash-rcwd.png)
+
 ## Uninstall
 ```
   make uninstall
@@ -91,4 +135,4 @@ command.
 carl.anderson@gmail.com (Carl Anderson)
 
 ### Updated
-2017-03-16
+2018-01-03
