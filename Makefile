@@ -35,14 +35,13 @@ all:	build man
 
 new:	clean all
 
-filesystem:
+filesystem: man
 	mkdir -p files/${BIN_DIR}
 	mkdir -p files/${ETC_DIR}
 	mkdir -p files/${LIB_DIR}/sh
-	mkdir -p files/${MAN_DIR}
 	chmod 755 files/${LIB_DIR}/sh files/${ETC_DIR}
-	cp -a shell/* files/${LIB_DIR}/sh
-	cp -a config queries files/${ETC_DIR}
+	cp shell/* files/${LIB_DIR}/sh
+	cp config queries files/${ETC_DIR}
 
 build_python: filesystem
 	@ printf "\nCompiling source code...\n"
@@ -62,6 +61,7 @@ build: build_python build_c
 
 man:
 	@ printf "\nGenerating man pages...\n"
+	mkdir -p files/${MAN_DIR}
 	sed -e "s:__VERSION__:Version ${RVERSION}:" man/_ash_log.1 \
 	  | sed -e "s:__DATE__:${UPDATED}:" \
 	  | gzip -9 -c > ./files${MAN_DIR}/_ash_log.1.gz
@@ -72,28 +72,29 @@ man:
 	cp -af ./files${MAN_DIR}/ash_query.1.gz ./files${MAN_DIR}/ash_query.py.1.gz
 	chmod 644 ./files${MAN_DIR}/*ash*.1.gz
 
-fixperms:
+fixperms: filesystem
 	chmod 644 files/${LIB_DIR}/* files/${ETC_DIR}/*
+	chmod 755 files/${LIB_DIR}/sh
 
 overlay.tar.gz: fixperms
-	@ cd files && \
-	sudo tar -cpzf ../overlay.tar.gz $$( \
+	@ cd files && sleep 10 && \
+	sudo tar -cvpzf ../overlay.tar.gz $$( \
 	  find . -type f -o -type l \
 	    | grep -v '\.git' \
 	)
 
-install: build man overlay.tar.gz uninstall
+install: build overlay.tar.gz uninstall
 	@ echo "\nInstalling files:"
 	sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
 	@ printf "\n 0/ - Install completed!\n<Y    See: ${BEGIN_URL}\n/ \\ \n"
 
-install_python: build_python man overlay.tar.gz uninstall
+install_python: build_python overlay.tar.gz uninstall
 	@ printf "\nInstalling Python Advanced Shell History...\n"
 	@ echo "\nInstalling files:"
 	sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
 	@ printf "\n 0/ - Install completed!\n<Y    See: ${BEGIN_URL}\n/ \\ \n"
 
-install_c: build_c man overlay.tar.gz uninstall
+install_c: build_c overlay.tar.gz uninstall
 	@ printf "\nInstalling C++ Advanced Shell History...\n"
 	@ echo "\nInstalling files:"
 	sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
@@ -101,7 +102,7 @@ install_c: build_c man overlay.tar.gz uninstall
 
 uninstall:
 	@ printf "\nUninstalling Advanced Shell History...\n"
-	sudo rm -ri ${ETC_DIR} ${LIB_DIR} || true
+	sudo rm -rfv ${ETC_DIR} ${LIB_DIR} || true
 	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}
 	sudo rm -f ${BIN_DIR}/{_ash_log,ash_query}.py
 	sudo rm -f ${MAN_DIR}/{_ash_log,ash_query}.1.gz
@@ -123,6 +124,7 @@ src_tarball: clean tarball
 clean:
 	@ printf "\nCleaning temp and trash files...\n"
 	cd src && make distclean
+	chmod +x files/${LIB_DIR}/* || true
 	rm -rf files/${BIN_DIR}
 	rm -rf files/${ETC_DIR}
 	rm -rf files/${LIB_DIR}
