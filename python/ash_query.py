@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2012 Carl Anderson
+# Copyright 2018 Carl Anderson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ TOOD(cpa): add logging to this at some point.
 from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-__version__ = '0.8r1'
+__version__ = '0.8r2'
 
 
 import csv
@@ -202,7 +202,7 @@ class AutoFormatter(Formatter):
     min_area = length * width
     areas = [min_area for _ in widths]
 
-    for c in xrange(len(widths)):
+    for c in range(len(widths)):
       # Test each row in the column to see if it is a duplicate of the previous
       # row.  If so, it will be de-duped in the output.  If not, it means an
       # extra row will be added, so we adjust the length variable accordingly.
@@ -221,7 +221,7 @@ class AutoFormatter(Formatter):
         areas[c + 1] = width * length
 
     # Find the rightmost minimum area from all simulated areas.
-    for c in xrange(len(widths), 0, -1):
+    for c in range(len(widths), 0, -1):
       if areas[c - 1] == min_area:
         return c - 1
     return 0
@@ -237,7 +237,7 @@ class AutoFormatter(Formatter):
     # Each grouped heading appears on its own row, with the following row
     # indented one extra separator.
     if Formatter.show_headings:
-      for c in xrange(cols):
+      for c in range(cols):
         if c < levels:
           grouped_header = '%s\n%s' % (rs[0][c], Formatter.separator * (c + 1))
           sys.stdout.write(grouped_header)
@@ -248,9 +248,9 @@ class AutoFormatter(Formatter):
           break
 
     # Print the result set values.
-    prev = [None for _ in xrange(levels)]
+    prev = [None for _ in range(levels)]
     for row in rs[1:]:
-      for c in xrange(cols):
+      for c in range(cols):
         value = row[c]
         if c < levels:
           if value != prev[c]:
@@ -258,7 +258,7 @@ class AutoFormatter(Formatter):
             sys.stdout.write(str(value))
             if c < cols - 1:
               sys.stdout.write('\n' + Formatter.separator * (c + 1))
-              for x in xrange(c, levels):
+              for x in range(c, levels):
                 prev[x] = None
             prev[c] = value
           else:
@@ -310,7 +310,7 @@ def main(argv):
   # Print an alert if one was specified.
   flags = Flags()
 
-  # If no arguments were given, it may be best to show --help.>>
+  # If no arguments were given, it may be best to show --help.
   if len(argv) == 1:
     config = util.Config()
     if config.Sets('DEFAULT_QUERY'):

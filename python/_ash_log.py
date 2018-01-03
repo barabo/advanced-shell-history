@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2017 Carl Anderson
+# Copyright 2018 Carl Anderson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ system-specific metadata.
 from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-__version__ = '0.8r1'
+__version__ = '0.8r2'
 
 
 import logging

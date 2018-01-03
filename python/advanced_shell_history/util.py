@@ -1,5 +1,5 @@
 #
-# Copyright 2017 Carl Anderson
+# Copyright 2018 Carl Anderson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,13 +20,14 @@ logging, flag parsing, configuration and database management.
 """
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-__version__ = '0.8r1'
+__version__ = '0.8r2'
 
 
 import argparse
 import logging
 import os
 import sqlite3
+import sys
 
 
 class Flags(argparse.ArgumentParser):
@@ -113,12 +114,12 @@ def InitLogging():
   config = Config()
   level = config.GetString('LOG_LEVEL') or 'INFO'
   level = hasattr(logging, level) and getattr(logging, level) or logging.DEBUG
-  format = '%(asctime)sSESSION ' + session_id + ': %(levelname)s: %(message)s'
+  fmt = '%(asctime)sSESSION ' + session_id + ': %(levelname)s: %(message)s'
   kwargs = {
-    'datefmt': config.GetString('LOG_DATE_FMT'),
-    'filename': config.GetString('LOG_FILE'),
-    'format': format,
-    'level': level,
+      'datefmt': config.GetString('LOG_DATE_FMT'),
+      'filename': config.GetString('LOG_FILE'),
+      'format': fmt,
+      'level': level,
   }
   logging.basicConfig(**kwargs)
 
@@ -169,6 +170,8 @@ class Database(object):
     """Initialize a Database with an open connection to the history database."""
     if Database.filename is None:
       Database.filename = Config().GetString('HISTORY_DB')
+    if Database.filename is None:
+      logging.error('Missing ASH_CFG_HISTORY_DB variable?')
     self.connection = sqlite3.connect(Database.filename)
     self.connection.row_factory = sqlite3.Row
     self.cursor = self.connection.cursor()
