@@ -56,11 +56,11 @@ setopt inc_append_history  # Forces log file to be appended after each command.
 
 
 ##
-# Invoked by ash::log in the common library (see parent directory).
+# Invoked by __ash_log in the common library (see parent directory).
 #
-function ash::last_command() {
+function __ash_last_command() {
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::last_command && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_last_command && return
 
   local cmd cmd_no start_ts end_ts=$( date +%s )
   read start_ts <<< "$( grep "^:" "${HISTFILE}" | tail -n1 | cut -d: -f2 )"
@@ -72,14 +72,14 @@ function ash::last_command() {
 ##
 # Placeholder function.
 #
-function ash::original_precmd() {
+function __ash_original_precmd() {
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::original_precmd && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_original_precmd && return
 }
 
 # This takes the definition of the original precmd (if one was defined) and
-# renames it to ash::original_precmd (overwriting the placeholder above).
-source <( typeset -f precmd | sed -e 's/^precmd/ash::original_precmd/' )
+# renames it to __ash_original_precmd (overwriting the placeholder above).
+source <( typeset -f precmd | sed -e 's/^precmd/__ash_original_precmd/' )
 
 
 ##
@@ -96,10 +96,10 @@ function precmd() {
         ${ASH_LOG_BIN} -a "${ASH_CFG_MOTD}session ${ASH_SESSION_ID}"
       fi
     else
-      ASH=1 ash::log ${pipest_ash[@]}
+      ASH=1 __ash_log ${pipest_ash[@]}
     fi
   fi
-  ASH=1 ash::original_precmd
+  ASH=1 __ash_original_precmd
 
   local rval=${pipest_ash[1]}
   pipest_ash=( ${pipest_ash[2,-1]} )

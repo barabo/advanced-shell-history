@@ -55,13 +55,13 @@ fi
 
 # Display error and abort if PROMPT_COMMAND is (already) readonly.
 if readonly -p | grep -q "^declare -[[:alpha:]]\+ PROMPT_COMMAND="; then
-  if [[ "${PROMPT_COMMAND//ash::/}" == "${PROMPT_COMMAND}" ]]; then
+  if [[ "${PROMPT_COMMAND//__ash_/}" == "${PROMPT_COMMAND}" ]]; then
     ${ASH_LOG_BIN} -a \
         "Make PROMPT_COMMAND writable to enable advanced shell history."
     return
   fi
 fi
-export PROMPT_COMMAND='ASH=1 ash::begin_session'
+export PROMPT_COMMAND='ASH=1 __ash_begin_session'
 
 # HISTCONTROL is emptied primarily to remove the options that de-dupe identical
 # successive commands and remove comands with leading spaces from history.
@@ -80,11 +80,11 @@ shopt -s histappend
 ##
 # This is invoked when a new user session begins.
 #
-function ash::begin_session() {
+function __ash_begin_session() {
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::begin_session && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_begin_session && return
 
-  export PROMPT_COMMAND="ASH=1 ash::precmd \${?} \${PIPESTATUS[@]}"
+  export PROMPT_COMMAND="ASH=1 __ash_precmd \${?} \${PIPESTATUS[@]}"
   export ASH_SESSION_ID="$( ${ASH_LOG_BIN} --get_session_id )"
   if [[ -n "${ASH_CFG_MOTD:-}" ]]; then
     ${ASH_LOG_BIN} -a "${ASH_CFG_MOTD}session ${ASH_SESSION_ID}"
@@ -97,14 +97,14 @@ function ash::begin_session() {
 # Log the previous command and execute the previous PROMPT_COMMAND (if any)
 # afterward.  The previous command exit code is reset after this function.
 #
-function ash::precmd() {
+function __ash_precmd() {
   # Do nothing if this variable is set.
   [[ -n "${ASH_DISABLED:-}" ]] && return
 
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::precmd && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_precmd && return
 
-  ash::log ${@:-0 0}
+  __ash_log ${@:-0 0}
   history -a
   if typeset -p ASH_PROMPT_COMMAND &>/dev/null; then
     "${ASH_PROMPT_COMMAND}"
@@ -117,11 +117,11 @@ function ash::precmd() {
 
 
 ##
-# Invoked by ash::log.
+# Invoked by __ash_log.
 #
-function ash::last_command() {
+function __ash_last_command() {
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::last_command && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_last_command && return
 
   local cmd_no start_ts end_ts="$( date +%s )" cmd
   read -r cmd_no start_ts cmd <<< "$( builtin history 1 )"
@@ -130,10 +130,10 @@ function ash::last_command() {
 
 
 # Protect the functions.
-readonly -f ash::begin_session
-readonly -f ash::last_command
-readonly -f ash::precmd
+readonly -f __ash_begin_session
+readonly -f __ash_last_command
+readonly -f __ash_precmd
 
 # Export functions used by subshells (not begin_session).
-#export -f ash::last_command
-#export -f ash::precmd
+#export -f __ash_last_command
+#export -f __ash_precmd

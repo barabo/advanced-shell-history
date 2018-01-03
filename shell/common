@@ -23,6 +23,9 @@ if [[ -z "${ASH_LOG_BIN}" ]]; then
   ASH_LOG_BIN=/usr/local/bin/_ash_log
 fi
 if ! [[ -x "${ASH_LOG_BIN}" ]]; then
+  ASH_LOG_BIN=/usr/local/bin/_ash_log.py
+fi
+if ! [[ -x "${ASH_LOG_BIN}" ]]; then
   return
 fi
 
@@ -53,12 +56,12 @@ fi
 # accidentally.
 #
 # Internally, this function is used within protected functions like this:
-#   function ash::example() {
-#     [[ "${ASH:-0}" == "0" ]] && ash::info ash::example && return
+#   function __ash_example() {
+#     [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_example && return
 #     # Protected function code here...
 #   }
 #
-function ash::info() {
+function __ash_info() {
   cat << EOF_INFO
 ${@:-This} is an internal function of the advanced shell history utility.
 EOF_INFO
@@ -71,16 +74,16 @@ EOF_INFO
 # Args:
 #   rval: The numeric exit code from the last user-entered command.
 #
-function ash::end_session() {
+function __ash_end_session() {
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::end_session && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_end_session && return
 
-  ash::log "${@}"
+  __ash_log "${@}"
   ${ASH_LOG_BIN} --end_session --exit ${1}
 }
 
 # This is executed when the user types 'exit'
-trap 'ASH=1 ash::end_session ${?} ${PIPESTATUS[@]} ${pipestatus[@]}' EXIT TERM
+trap 'ASH=1 __ash_end_session ${?} ${PIPESTATUS[@]} ${pipestatus[@]}' EXIT TERM
 
 # This avoids logging duplicate commands when the user presses Ctrl-C while
 # entering a command.
@@ -95,9 +98,9 @@ export ASH_SKIP=0
 #   rval: The numeric exit code from the last user-entered command.
 #   pipes: The set of pipe exit codes (one or more codes).
 #
-function ash::log() {
+function __ash_log() {
   # Prevent users from manually invoking this function from the command line.
-  [[ "${ASH:-0}" == "0" ]] && ash::info ash::log && return
+  [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_log && return
 
   # ASH_SKIP is set only when the user presses Ctrl-C while entering a command.
   # Since this kills the command before it was executed, there's no history to
@@ -108,7 +111,7 @@ function ash::log() {
   fi
 
   local no start end cmd rval="${1}" && shift
-  read -r no start end cmd <<< "$( ash::last_command )"
+  read -r no start end cmd <<< "$( __ash_last_command )"
   local pipes="$( sed -e 's: :_:g' <<< "${@}" )"
 
   # Log the command.
@@ -123,8 +126,8 @@ function ash::log() {
 
 
 # Protect the functions.
-readonly -f ash::end_session
-readonly -f ash::log
+readonly -f __ash_end_session
+readonly -f __ash_log
 
-#export -f ash::end_session
-#export -f ash::log
+#export -f __ash_end_session
+#export -f __ash_log
