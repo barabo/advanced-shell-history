@@ -43,6 +43,27 @@ Save your command line history in a sqlite3 DB!
   make install         # Installs both versions
 ```
 
+## Configure
+You will need to source a couple files in order for this to work by default.
+
+First, source the configuration file in `/usr/local/etc/advanced-shell-history/config`.
+This will define several environment variables that are needed for the logger and the
+query app.
+
+Next, export the `ASH_CFG_SYSTEM_QUERY_FILE` if you would like to use the systemwide
+queries!  Without this exported line, the `ash_query` command will not know where to find
+the queries needed to extract from the history database.
+
+Finally, you must source the shell code for your shell.  For example, `bash` users source
+`/usr/local/lib/advanced_shell_history/sh/bash` and `zsh` users source `/usr/local/lib/advanced_shell_history/sh/zsh`.
+
+Here's a snippet you can paste into your `~/.bashrc` file:
+```{sh}
+  source /usr/local/etc/advanced-shell-history/config
+  export ASH_CFG_SYSTEM_QUERY_FILE
+  source /usr/local/lib/advanced_shell_history/sh/bash
+```
+
 ## Uninstall
 ```
   make uninstall
