@@ -22,8 +22,17 @@
 #   ASH_LOG_BIN - the name of the binary that stores history in the db.
 #
 
-# Prevent errors from sourcing this file mor than once.
-[[ -n "${ASH_SESSION_ID}" ]] && return
+# Prevent errors from sourcing this file more than once.
+#
+# Under some circumstances ASH_SESSION_ID can be set but the functions not
+# defined properly, so we explicitly check for the __ash_* functions before
+# returning here.
+if [[ -n "${ASH_SESSION_ID}" ]]; then
+  declare -F |grep -q '__ash_'
+  if [[ $? -eq 0 ]]; then
+    return
+  fi
+fi
 
 # Make sure we are running the shell we think we are running.
 if ! ps ho command $$ | grep -q "bash"; then
