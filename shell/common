@@ -85,9 +85,6 @@ function __ash_end_session() {
 # This is executed when the user types 'exit'
 trap 'ASH=1 __ash_end_session ${?} ${PIPESTATUS[@]} ${pipestatus[@]}' EXIT TERM
 
-# This avoids logging duplicate commands when the user presses Ctrl-C while
-# entering a command.
-trap 'ASH_SKIP=1' INT
 export ASH_SKIP=0
 
 
