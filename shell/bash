@@ -137,6 +137,11 @@ function __ash_last_command() {
   echo ${cmd_no:-0} ${start_ts:-0} ${end_ts:-0} "${cmd:-UNKNOWN}"
 }
 
+# This avoids logging duplicate commands when the user presses Ctrl-C while
+# entering a command.
+# Only need to trap Ctrl-C in bash. zsh do not need to do it and no duplicate
+# history in zsh. (Ctrl-C will stop works if do the same trap in zsh!)
+trap 'ASH_SKIP=1' INT
 
 # Protect the functions.
 readonly -f __ash_begin_session
