@@ -76,7 +76,7 @@ string get_target(const Severity level) {
  * Constructs a logger and adds the severity to the output.
  */
 Logger::Logger(const Severity lvl)
-  : log(get_target(lvl).c_str(), fstream::out | fstream::app), level(lvl)
+  : ostream(NULL), log(get_target(lvl).c_str(), fstream::out | fstream::app), level(lvl)
 {
   char time_now[200];
   time_t t = time(NULL);
