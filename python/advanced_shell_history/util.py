@@ -192,7 +192,7 @@ class Database(object):
   def SanityCheck(cls, sql):
     return sql and sqlite3.complete_statement(sql)
 
-  def Fetch(self, sql, params=(), limit=None):
+  def Fetch(self, sql, params=(), limit=None, reverse=False):
     """Execute a select query and return the result set."""
     if self.SanityCheck(sql):
       try:
@@ -211,6 +211,8 @@ class Database(object):
             rows.append(row)
             fetched += 1
         rows.insert(0, first_row)
+        if reverse:
+          rows.reverse()
         rows.insert(0, headings)
         return rows
       except sqlite3.Error as e:
