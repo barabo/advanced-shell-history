@@ -210,8 +210,8 @@ class Database(object):
             if not row: break
             rows.append(row)
             fetched += 1
+        rows.insert(0, first_row)
         rows.insert(0, headings)
-        rows.insert(1, first_row)
         return rows
       except sqlite3.Error as e:
         print >> sys.stderr, 'Failed to execute query: %s (%s)' % (sql, params)
