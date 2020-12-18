@@ -197,9 +197,9 @@ class Database(object):
     if self.SanityCheck(sql):
       try:
         self.cursor.execute(sql, params)
-        row = self.cursor.fetchone()
-        if not row: return None
-        headings = tuple(row.keys())
+        first_row = self.cursor.fetchone()
+        if not first_row: return None
+        headings = tuple(first_row.keys())
         fetched = 1
         if limit is None or limit <= 0:
           rows = self.cursor.fetchall()
@@ -211,7 +211,7 @@ class Database(object):
             rows.append(row)
             fetched += 1
         rows.insert(0, headings)
-        rows.insert(1, row)
+        rows.insert(1, first_row)
         return rows
       except sqlite3.Error as e:
         print >> sys.stderr, 'Failed to execute query: %s (%s)' % (sql, params)
