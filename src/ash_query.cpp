@@ -48,6 +48,7 @@ DEFINE_string(query, 'q', 0, "The name of the saved query to execute.");
 DEFINE_flag(list_formats, 'F', "Display all available formats.");
 DEFINE_flag(hide_headings, 'H', "Hide column headings from query results.");
 DEFINE_flag(list_queries, 'Q', "Display all saved queries.");
+DEFINE_flag(reverse, 'R', "display results in reverse order.");
 DEFINE_flag(version, 0, "Show the version and exit.");
 
 
@@ -115,7 +116,7 @@ int execute(const string & sql) {
   }
 
   // Execute the query and display any results.
-  ResultSet * rs = db.exec(sql, FLAGS_limit);
+  ResultSet * rs = db.exec(sql, FLAGS_limit, FLAGS_reverse);
   formatter -> show_headings(!FLAGS_hide_headings);
   formatter -> insert(rs, cout);
   if (rs) delete rs;
