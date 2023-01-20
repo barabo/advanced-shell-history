@@ -1,4 +1,5 @@
 TODO
+  [ ] SPIKE: use the [DEBUG](https://www.davidpashley.com/articles/xterm-titles-with-bash/) trap to catch commands instead of relying on a PROMPT_COMMAND hook
   [ ] rewrite the schema to allow easy per-host aggregation (session must include a machine ID)
   [ ] add a script to cut a new release
   [ ] write more interesting queries
