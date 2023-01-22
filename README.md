@@ -126,13 +126,12 @@ command.
     options necessary for the magic to work.
 
 ## Bugs
-  * The C++ version does not compile in OSX because the CLOCK_MONOTONIC symbol is undefined.
-    * Use the python version for now.
   * Doesn't capture exec'ed commands: example: `exec rm /tmp/foo # is lost`
   * The python version is about 10x slower than the C++ version.
+  * multi-line commands only include the first line in history
 
 ### Author
 carl.anderson@gmail.com (Carl Anderson)
 
 ### Updated
-2018-01-03
+2023-01-21
