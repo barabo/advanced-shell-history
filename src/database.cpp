@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 Carl Anderson
+   Copyright 2023 Carl Anderson
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -217,7 +217,10 @@ void ash_sleep() {
     }
     --sleep_attempts;
 
+#ifdef __APPLE__
     // Sleep and verify the return code.
+    int rval = 0;
+#else
     int rval = clock_nanosleep(CLOCK_MONOTONIC, 0, &to_sleep, &remaining);
     switch (rval) {
       case -1: 
@@ -238,6 +241,7 @@ void ash_sleep() {
       default:
         LOG(ERROR) << "Unexpected rval from clock_nanosleep: " << rval;
     }
+#endif
 
     // If there is any time remaining, prepare to sleep again.
     if (remaining.tv_sec == 0

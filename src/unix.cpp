@@ -60,7 +60,12 @@ const string proc_stat(const int target, const pid_t pid) {
  * Returns the current working directory.
  */
 const string unix::cwd() {
+#ifdef _GNU_SOURCE
   char * c = get_current_dir_name();
+#else
+  char * c = (char *) malloc(PATH_MAX * sizeof(char));
+  getcwd(c, PATH_MAX);
+#endif
   if (!c) return DBObject::quote(0);
   string cwd(c);
   free(c);
