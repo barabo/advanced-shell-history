@@ -1,5 +1,5 @@
 #
-#   Copyright 2017 Carl Anderson
+#   Copyright 2023 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,7 +27,12 @@ TRASH	:= ${OBJS} ${EXES} core Makefile-e
 CPP	:= g++
 C	:= gcc
 FLAGS	:= -g -Wall -DASH_VERSION="\"${VERSION}\"" -ansi -pedantic -O2
+SYSTEM  := $(shell ${C} -dumpmachine)
+ifeq (apple, $(findstring apple,${SYSTEM}))
+RT_LIB	:=
+else
 RT_LIB	:= -lrt
+endif
 
 .PHONY:	all clean distclean new
 all:	${EXES}
