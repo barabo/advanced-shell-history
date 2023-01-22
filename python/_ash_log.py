@@ -22,7 +22,7 @@ system-specific metadata.
 from __future__ import print_function
 
 __author__ = 'Carl Anderson (carl.anderson@gmail.com)'
-__version__ = '0.8r2'
+__version__ = '0.9r0'
 
 
 import logging
