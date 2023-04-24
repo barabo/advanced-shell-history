@@ -741,6 +741,7 @@ void Queries::lazy_load() {
 
   // Load these files, in this order.
   query::files.push_back("/etc/ash/queries");
+  query::files.push_back(string(getenv("ASH_CFG_SYSTEM_QUERY_FILE")));
   query::files.push_back(string(getenv("HOME")) + "/.ash/queries");
 
   // Initialize the input file.
