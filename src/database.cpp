@@ -28,6 +28,7 @@
 #include <time.h>      /* for time */
 #include <unistd.h>    /* for getpid */
 
+#include <algorithm>
 #include <iostream>
 #include <list>
 #include <sstream>
@@ -327,7 +328,7 @@ try_prepare:
 /**
  * Execute a query or abort the program with the DB error message.
  */
-ResultSet * Database::exec(const string & query, const int limit) const {
+ResultSet * Database::exec(const string & query, const int limit, const bool reverse) const {
   // Load the relevant configured values.
   Config & config = Config::instance();
 
@@ -411,6 +412,10 @@ try_sql:
   // within a for loop and it's convenient to break the loop within the switch.
 finalize:
   sqlite3_finalize(ps);
+  
+  if (reverse && rows) {
+    std::reverse(results.begin(), results.end());
+  }
 
   return rows ? new ResultSet(headers, results) : 0;
 }
