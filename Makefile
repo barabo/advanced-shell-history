@@ -14,9 +14,9 @@
 #   limitations under the License.
 #
 
-REV := r2
-VERSION  := 0.8
-UPDATED  := 2018-01-03
+REV := r0
+VERSION  := 0.9
+UPDATED  := 2026-03-01
 RVERSION := ${VERSION}${REV}
 ETC_DIR  := /usr/local/etc/advanced-shell-history
 LIB_DIR  := /usr/local/lib/advanced_shell_history
