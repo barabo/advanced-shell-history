@@ -77,11 +77,6 @@ export PROMPT_COMMAND='ASH=1 __ash_begin_session'
 export HISTCONTROL=""
 readonly HISTCONTROL
 
-# HISTTIMEFORMAT is changed to unix epoch time to allow easy duration
-# calculations by subtracting start from end timestamps.
-export HISTTIMEFORMAT="%s "
-readonly HISTTIMEFORMAT
-
 # Cause bash to log commands immediately, rather than upon shell exit.
 shopt -s histappend
 
@@ -133,7 +128,7 @@ function __ash_last_command() {
   [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_last_command && return
 
   local cmd_no start_ts end_ts="$( date +%s )" cmd
-  read -r cmd_no start_ts cmd <<< "$( builtin history 1 )"
+  read -r cmd_no start_ts cmd <<< "$( HISTTIMEFORMAT="%s " builtin history 1 )"
   echo ${cmd_no:-0} ${start_ts:-0} ${end_ts:-0} "${cmd:-UNKNOWN}"
 }
 
