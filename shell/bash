@@ -109,7 +109,7 @@ function __ash_precmd() {
   [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_precmd && return
 
   __ash_log ${@:-0 0}
-  history -a
+  \builtin history -a
   if typeset -p ASH_PROMPT_COMMAND &>/dev/null; then
     "${ASH_PROMPT_COMMAND}"
   fi
@@ -126,10 +126,8 @@ function __ash_precmd() {
 function __ash_last_command() {
   # Prevent users from manually invoking this function from the command line.
   [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_last_command && return
-
-  local cmd_no start_ts end_ts="$( date +%s )" cmd
-  read -r cmd_no start_ts cmd <<< "$( HISTTIMEFORMAT="%s " builtin history 1 )"
-  echo ${cmd_no:-0} ${start_ts:-0} ${end_ts:-0} "${cmd:-UNKNOWN}"
+  HISTTIMEFORMAT="%s " builtin history 1 \
+    | sed -e "1s:\s*\([0-9]*\)\s*\([0-9]*\) :\1 \2 $( date +%s ) :"
 }
 
 # This avoids logging duplicate commands when the user presses Ctrl-C while
