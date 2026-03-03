@@ -109,7 +109,7 @@ function __ash_precmd() {
   [[ "${ASH:-0}" == "0" ]] && __ash_info __ash_precmd && return
 
   __ash_log ${@:-0 0}
-  history -a
+  \builtin history -a
   if typeset -p ASH_PROMPT_COMMAND &>/dev/null; then
     "${ASH_PROMPT_COMMAND}"
   fi
