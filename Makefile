@@ -14,10 +14,11 @@
 #   limitations under the License.
 #
 
-REV := r0
+REV := r1
 VERSION  := 0.9
 UPDATED  := 2026-03-01
 RVERSION := ${VERSION}${REV}
+INSTALL  := /
 ETC_DIR  := /usr/local/etc/advanced-shell-history
 LIB_DIR  := /usr/local/lib/advanced_shell_history
 BIN_DIR  := /usr/local/bin
@@ -85,19 +86,19 @@ overlay.tar.gz: fixperms
 
 install: build overlay.tar.gz uninstall
 	@ echo "\nInstalling files:"
-	sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
+	sudo tar -xpv --no-same-owner -C ${INSTALL} -f overlay.tar.gz
 	@ printf "\n 0/ - Install completed!\n<Y    See: ${BEGIN_URL}\n/ \\ \n"
 
 install_python: build_python overlay.tar.gz uninstall
 	@ printf "\nInstalling Python Advanced Shell History...\n"
 	@ echo "\nInstalling files:"
-	sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
+	sudo tar -xpv --no-same-owner -C ${INSTALL} -f overlay.tar.gz
 	@ printf "\n 0/ - Install completed!\n<Y    See: ${BEGIN_URL}\n/ \\ \n"
 
 install_c: build_c overlay.tar.gz uninstall
 	@ printf "\nInstalling C++ Advanced Shell History...\n"
 	@ echo "\nInstalling files:"
-	sudo tar -xpv --no-same-owner -C / -f overlay.tar.gz
+	sudo tar -xpv --no-same-owner -C ${INSTALL} -f overlay.tar.gz
 	@ printf "\n 0/ - Install completed!\n<Y    See: ${BEGIN_URL}\n/ \\ \n"
 
 uninstall:
