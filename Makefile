@@ -1,5 +1,5 @@
 #
-#   Copyright 2017 Carl Anderson
+#   Copyright 2026 Carl Anderson
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 #   limitations under the License.
 #
 
-REV := r0
+REV := r1
 VERSION  := 0.9
-UPDATED  := 2026-03-01
+UPDATED  := 2026-03-03
 RVERSION := ${VERSION}${REV}
 ETC_DIR  := /usr/local/etc/advanced-shell-history
 LIB_DIR  := /usr/local/lib/advanced_shell_history
