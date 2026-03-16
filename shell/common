@@ -108,8 +108,14 @@ function __ash_log() {
   fi
 
   local no start end cmd rval="${1}" && shift
-  read -r no start end cmd <<< "$( __ash_last_command )"
+  local last="$( __ash_last_command )"
   local pipes="$( sed -e 's: :_:g' <<< "${@}" )"
+  read -r no start end cmd <<< "${last}"
+
+  # Multi-line commands need special handling.
+  if (( $( wc -l <<< "${last}" ) > 1 )); then
+    cmd="$( sed -e "1s:^${no} ${start} ${end} ::" <<< "${last}" )"
+  fi
 
   # Log the command.
   ${ASH_LOG_BIN} \
