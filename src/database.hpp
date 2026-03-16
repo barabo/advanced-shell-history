@@ -74,7 +74,7 @@ class Database {
     Database(const string & filename);
     virtual ~Database();
 
-    ResultSet * exec(const string & query, const int limit=0) const;
+    ResultSet * exec(const string & query, const int limit=0, const bool reverse=false) const;
 
     long int insert(DBObject * object) const;
 

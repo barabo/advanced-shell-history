@@ -55,6 +55,7 @@ class Flags(util.Flags):
     ('F', 'list_formats', 'display all available formats'),
     ('H', 'hide_headings', 'hide column headings from query results'),
     ('Q', 'list_queries', 'display all saved queries'),
+    ('R', 'reverse', 'display results in reverse order'),
   )
 
   def __init__(self):
@@ -352,7 +353,7 @@ def main(argv):
       return 1
 
     sql = Queries.Get(flags.query)[1]
-    rs = util.Database().Fetch(sql, limit=flags.limit)
+    rs = util.Database().Fetch(sql, limit=flags.limit, reverse=flags.reverse)
     fmt.Print(rs)
 
   return 0

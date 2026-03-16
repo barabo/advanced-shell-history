@@ -192,14 +192,14 @@ class Database(object):
   def SanityCheck(cls, sql):
     return sql and sqlite3.complete_statement(sql)
 
-  def Fetch(self, sql, params=(), limit=None):
+  def Fetch(self, sql, params=(), limit=None, reverse=False):
     """Execute a select query and return the result set."""
     if self.SanityCheck(sql):
       try:
         self.cursor.execute(sql, params)
-        row = self.cursor.fetchone()
-        if not row: return None
-        headings = tuple(row.keys())
+        first_row = self.cursor.fetchone()
+        if not first_row: return None
+        headings = tuple(first_row.keys())
         fetched = 1
         if limit is None or limit <= 0:
           rows = self.cursor.fetchall()
@@ -210,8 +210,10 @@ class Database(object):
             if not row: break
             rows.append(row)
             fetched += 1
+        rows.insert(0, first_row)
+        if reverse:
+          rows.reverse()
         rows.insert(0, headings)
-        rows.insert(1, row)
         return rows
       except sqlite3.Error as e:
         print >> sys.stderr, 'Failed to execute query: %s (%s)' % (sql, params)
